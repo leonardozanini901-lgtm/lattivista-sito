@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUBLISHER // CONTROL PANEL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            min-height: 100vh;
+            font-family: monospace;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(10, 10, 12, 0.94);
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(14px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-header h1 {
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: #00ffaa;
+        }
+
+        /* LAYOUT MAIN */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        /* CONTROLS & FORM */
+        .control-group {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(10, 10, 12, 0.6);
+        }
+
+        .control-group legend {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 0 6px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .control-item label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .text-input, textarea {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 11px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .text-input:focus, textarea:focus {
+            border-color: #00ffaa;
+        }
+
+        /* ICONA CALENDARIO BIANCA */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) brightness(1000%);
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .action-btn {
+            padding: 12px;
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-family: inherit;
+            font-size: 11px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .action-btn.highlight {
+            border-color: #00ffaa;
+            color: #00ffaa;
+        }
+
+        .action-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .info-note {
+            font-size: 10px;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.45);
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            padding-left: 8px;
+        }
+
+        /* PREVIEW CONTAINER */
+        .img-preview-box {
+            width: 100%;
+            height: 200px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        .img-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* CONSOLE LOG */
+        #console-log {
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            font-size: 10px;
+            height: 160px;
+            overflow-y: auto;
+            color: #00ffaa;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* AUTH MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MODALE AUTENTICAZIONE GITHUB -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-content">
+            <fieldset class="control-group">
+                <legend>AUTENTICAZIONE GITHUB // API</legend>
+                <div class="info-note">
+                    Inserisci il Token di Accesso Personale (PAT) e le info della repository per iniziare.
+                </div>
+                <div class="control-item">
+                    <label>GitHub Personal Access Token (PAT)</label>
+                    <input type="password" id="cfg-token" class="text-input">
+                </div>
+                <div class="control-item">
+                    <label>Repository Owner (Username / Org)</label>
+                    <input type="text" id="cfg-owner" class="text-input">
+                </div>
+                <div class="control-item">
+                    <label>Repository Name</label>
+                    <input type="text" id="cfg-repo" class="text-input">
+                </div>
+                <div class="control-item">
+                    <label>Branch (Default: main)</label>
+                    <input type="text" id="cfg-branch" class="text-input" value="main">
+                </div>
+                <button id="save-auth-btn" class="action-btn highlight">CONNETTI E CARICA DATI</button>
+            </fieldset>
+        </div>
+    </div>
+
+    <!-- MAIN APP HEADER -->
+    <header class="app-header">
+        <h1>ADMIN PUBLISHER // CONTROL PANEL</h1>
+        <button id="logout-btn" class="action-btn" style="width: auto; padding: 6px 12px; font-size: 9px;">DISCONNETTI</button>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="main-container">
+        
+        <!-- COLONNA SINISTRA: EDITA ARTICOLO -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <fieldset class="control-group">
+                <legend>01 // METADATI ARTICOLO</legend>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="control-item">
+                        <label>ID Articolo (Senza spazi)</label>
+                        <input type="text" id="art-id" class="text-input" placeholder="es. il-nuovo-pensiero">
+                    </div>
+                    <div class="control-item">
+                        <label>TAG Articolo</label>
+                        <input type="text" id="art-tag" class="text-input" placeholder="es. EDITORIALE">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="control-item">
+                        <label>Titolo Principale</label>
+                        <input type="text" id="art-title" class="text-input" placeholder="Titolo dell'articolo">
+                    </div>
+                    <div class="control-item">
+                        <label>Data Pubblicazione (DD-MM-YYYY)</label>
+                        <input type="date" id="art-date" class="text-input">
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>Breve Descrizione</label>
+                    <textarea id="art-excerpt" placeholder="Piccola descrizione veloce dell'articolo visibile nella preview..."></textarea>
+                </div>
+
+                <div class="control-item">
+                    <label>Righe Copertina (Separate da invio)</label>
+                    <textarea id="art-cover-lines" placeholder="Titolo riga 1&#10;Titolo riga 2" style="height: 60px;"></textarea>
+                </div>
+            </fieldset>
+
+            <fieldset class="control-group">
+                <legend>02 // CONTENUTO HTML ARTICOLO</legend>
+                <div class="control-item">
+                    <label>Testo o Struttura HTML dell'Articolo</label>
+                    <textarea id="art-content" style="min-height: 220px;" placeholder="<p>Scrivi il contenuto dell'articolo qui...</p>"></textarea>
+                </div>
+            </fieldset>
+        </div>
+
+        <!-- COLONNA DESTRA: PREVIEW IMMAGINE & COMMIT -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <fieldset class="control-group">
+                <legend>03 // IMMAGINE PREVIEW (.WEBP)</legend>
+                <div class="img-preview-box" id="img-box">
+                    <span style="font-size: 10px; color: rgba(255,255,255,0.4);">Nessuna immagine</span>
+                    <img id="preview-img" class="hidden">
+                </div>
+                <button id="select-img-btn" class="action-btn">SELEZIONA IMMAGINE</button>
+                <input type="file" id="img-file-input" accept="image/*" class="hidden">
+                <div class="info-note">
+                    💡 L'immagine deve essere 800px per 1000px
+                </div>
+            </fieldset>
+
+            <fieldset class="control-group">
+                <legend>04 // AZIONE COMMIT</legend>
+                <button id="publish-btn" class="action-btn highlight">PUBBLICA ARTICOLO</button>
+            </fieldset>
+
+            <fieldset class="control-group">
+                <legend>CONSOLE LOG // REQUISITI & STATUS</legend>
+                <div id="console-log">In attesa di connessione API...</div>
+            </fieldset>
+        </div>
+
+    </main>
+
+    <script>
+        // Stato Globale
+        let config = { token: '', owner: '', repo: '', branch: 'main' };
+        let selectedWebpBase64 = null;
+
+        // Inizializzazione Data odierna
+        document.getElementById('art-date').value = new Date().toISOString().split('T')[0];
+
+        // Elementi DOM
+        const authModal = document.getElementById('auth-modal');
+        const consoleLog = document.getElementById('console-log');
+        const previewImg = document.getElementById('preview-img');
+
+        function log(msg) {
+            const time = new Date().toLocaleTimeString();
+            consoleLog.innerHTML += `\n[${time}] ${msg}`;
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+
+        // Carica Credenziali salvate
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedConfig = localStorage.getItem('gh_cms_config');
+            if (savedConfig) {
+                config = JSON.parse(savedConfig);
+                document.getElementById('cfg-token').value = config.token;
+                document.getElementById('cfg-owner').value = config.owner;
+                document.getElementById('cfg-repo').value = config.repo;
+                document.getElementById('cfg-branch').value = config.branch || 'main';
+                authModal.classList.add('hidden');
+                log("Connesso a " + config.owner + "/" + config.repo);
+            }
+        });
+
+        // Salvataggio Auth
+        document.getElementById('save-auth-btn').addEventListener('click', () => {
+            config.token = document.getElementById('cfg-token').value.trim();
+            config.owner = document.getElementById('cfg-owner').value.trim();
+            config.repo = document.getElementById('cfg-repo').value.trim();
+            config.branch = document.getElementById('cfg-branch').value.trim() || 'main';
+
+            if (!config.token || !config.owner || !config.repo) {
+                alert("Compila tutti i campi!");
+                return;
+            }
+
+            localStorage.setItem('gh_cms_config', JSON.stringify(config));
+            authModal.classList.add('hidden');
+            log("Configurazione salvata. Pronto.");
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('gh_cms_config');
+            authModal.classList.remove('hidden');
+            log("Disconnesso.");
+        });
+
+        // Gestione Selezione e Conversione Immagine in WebP
+        document.getElementById('select-img-btn').addEventListener('click', () => {
+            document.getElementById('img-file-input').click();
+        });
+
+        document.getElementById('img-file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    // Conversione in WebP
+                    const webpDataUrl = canvas.toDataURL('image/webp', 0.85);
+                    previewImg.src = webpDataUrl;
+                    previewImg.classList.remove('hidden');
+                    
+                    // Estrae stringa base64 pura
+                    selectedWebpBase64 = webpDataUrl.split(',')[1];
+                    log("Immagine convertita in WebP con successo.");
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // GitHub API Helpers
+        async function githubApi(path, method = 'GET', body = null) {
+            const url = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${path}?ref=${config.branch}`;
+            const headers = {
+                'Authorization': `Bearer ${config.token}`,
+                'Accept': 'application/vnd.github+json',
+                'Content-Type': 'application/json'
+            };
+
+            const options = { method, headers };
+            if (body) options.body = JSON.stringify(body);
+
+            const res = await fetch(url, options);
+            if (!res.ok && res.status !== 404) {
+                const err = await res.json();
+                throw new Error(err.message || res.statusText);
+            }
+            return res.status === 404 ? null : await res.json();
+        }
+
+        // UTF-8 / Base64 Safe Encoding Helper
+        function utf8ToBase64(str) {
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+                return String.fromCharCode('0x' + p1);
+            }));
+        }
+
+        function base64ToUtf8(str) {
+            return decodeURIComponent(Array.prototype.map.call(atob(str), (c) => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+        }
+
+        // Workflow di Pubblicazione
+        document.getElementById('publish-btn').addEventListener('click', async () => {
+            const id = document.getElementById('art-id').value.trim();
+            const title = document.getElementById('art-title').value.trim();
+            const tag = document.getElementById('art-tag').value.trim();
+            const date = document.getElementById('art-date').value;
+            const excerpt = document.getElementById('art-excerpt').value.trim();
+            const coverLinesText = document.getElementById('art-cover-lines').value.trim();
+            const contentHtml = document.getElementById('art-content').value.trim();
+
+            if (!id || !title) {
+                alert("Compila almeno ID e Titolo!");
+                return;
+            }
+
+            const coverLines = coverLinesText ? coverLinesText.split('\n').map(l => l.trim()) : [title];
+
+            try {
+                log("--> Inizio processo di pubblicazione per: " + id);
+
+                // 1. Carica / Aggiorna la Preview Image se presente
+                if (selectedWebpBase64) {
+                    log("Upload immagine preview WebP...");
+                    const imgPath = `assets/articles previews/${id}.webp`;
+                    const existingImg = await githubApi(imgPath);
+
+                    await githubApi(imgPath, 'PUT', {
+                        message: `Upload preview image per ${id}`,
+                        content: selectedWebpBase64,
+                        sha: existingImg ? existingImg.sha : undefined,
+                        branch: config.branch
+                    });
+                    log("✓ Immagine caricata in assets/articles previews/" + id + ".webp");
+                }
+
+                // 2. Carica / Aggiorna l'eventuale file HTML/Contenuto articolo dedicato
+                if (contentHtml) {
+                    log("Upload file contenuto articolo...");
+                    const contentPath = `articoli/${id}.html`;
+                    const existingFile = await githubApi(contentPath);
+
+                    await githubApi(contentPath, 'PUT', {
+                        message: `Aggiornato contenuto articolo ${id}`,
+                        content: utf8ToBase64(contentHtml),
+                        sha: existingFile ? existingFile.sha : undefined,
+                        branch: config.branch
+                    });
+                    log("✓ Contenuto file creato in articoli/" + id + ".html");
+                }
+
+                // 3. Scarica, aggiorna e salva articles.json
+                log("Lettura articles.json...");
+                const jsonFile = await githubApi("articles.json");
+                let articles = [];
+
+                if (jsonFile) {
+                    const rawJson = base64ToUtf8(jsonFile.content);
+                    articles = JSON.parse(rawJson);
+                }
+
+                const newArticle = {
+                    id,
+                    title,
+                    tag,
+                    date,
+                    excerpt,
+                    cover_lines: coverLines
+                };
+
+                // Sostituisce se existe, altrimenti aggiunge in cima
+                const existingIdx = articles.findIndex(a => a.id === id);
+                if (existingIdx >= 0) {
+                    articles[existingIdx] = newArticle;
+                    log("Articolo esistente aggiornato nella lista.");
+                } else {
+                    articles.unshift(newArticle);
+                    log("Nuovo articolo inserito in cima alla lista.");
+                }
+
+                log("Commit di articles.json...");
+                await githubApi("articles.json", 'PUT', {
+                    message: `Aggiornato articles.json con l'articolo: ${id}`,
+                    content: utf8ToBase64(JSON.stringify(articles, null, 2)),
+                    sha: jsonFile ? jsonFile.sha : undefined,
+                    branch: config.branch
+                });
+
+                log("🎉 PUBBLICAZIONE COMPLETATA CON SUCCESSO!");
+                alert("Articolo pubblicato con successo!");
+
+            } catch (err) {
+                log("❌ ERRORE: " + err.message);
+                alert("Errore durante la pubblicazione: " + err.message);
+            }
+        });
+    </script>
+</body>
+</html>
