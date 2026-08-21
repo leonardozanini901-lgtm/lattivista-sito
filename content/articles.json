@@ -1,0 +1,35 @@
+[
+  {
+    "id": "filiera-pane",
+    "title": "La filiera che nessuno racconta",
+    "tag": "Controcorrente",
+    "excerpt": "Tre grafici per capire dove va davvero il prezzo che paghi al supermercato.",
+    "cover_lines": ["Chi decide", "il prezzo del pane?"],
+    "date": "2026-01-10",
+    "body": [
+      "[Testo completo dell'articolo — sostituisci questo paragrafo con il contenuto vero. Puoi aggiungere tutti i paragrafi che vuoi: ogni voce di questo elenco diventa un paragrafo separato nella pagina.]"
+    ]
+  },
+  {
+    "id": "legge-sei-passaggi",
+    "title": "Come nasce una legge in 6 passaggi",
+    "tag": "Dietro il Palazzo",
+    "excerpt": "La mappa, semplificata, di chi scrive, modifica e approva ciò che ci riguarda.",
+    "cover_lines": ["Un emendamento,", "cento interessi"],
+    "date": "2026-01-17",
+    "body": [
+      "[Testo completo dell'articolo — sostituisci questo paragrafo con il contenuto vero.]"
+    ]
+  },
+  {
+    "id": "comitato-quartiere",
+    "title": "Il comitato di quartiere che ha vinto",
+    "tag": "Dal Paese",
+    "excerpt": "Intervista a chi ha fermato una discarica a forza di assemblee.",
+    "cover_lines": ["Una piazza", "di 19 anni"],
+    "date": "2026-01-24",
+    "body": [
+      "[Testo completo dell'articolo — sostituisci questo paragrafo con il contenuto vero.]"
+    ]
+  }
+]
