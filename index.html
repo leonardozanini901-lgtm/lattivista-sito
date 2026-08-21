@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L'Attivista — Foglio del nuovo pensiero</title>
+<title>L'Attivista - Foglio del nuovo pensiero</title>
 <link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body>
 
@@ -12,7 +13,7 @@
   <div class="wrap">
     <div class="masthead-top">
       <div>Anno I &nbsp;·&nbsp; Numero 01 &nbsp;·&nbsp; <span class="tag">Edizione digitale</span></div>
-      <div>Fondato nel 2026 — In un mondo da cambiare</div>
+      <div>Fondato nel 2026 -In un mondo da cambiare</div>
     </div>
     <div class="masthead-title-row">
       <div class="masthead-title">L'Attivista</div>
@@ -24,23 +25,33 @@
     <nav class="mainnav">
       <a href="#manifesto">Il Manifesto</a>
       <a href="#numeri">Ultimi Numeri</a>
+      <a href="#numeri">Archivio Articoli</a>
       <a href="#movimento">Il Movimento</a>
-      <a href="#contatti">Contatti</a>
     </nav>
   </div>
 </header>
 
 <section class="hero">
   <div class="wrap hero-grid">
-    <div>
+    <!-- Colonna sinistra: Ultimo numero -->
+      <div>
+        <div class="hero-kicker-wrap">
+          <span class="kicker">— Ultimo numero</span>
+          <span class="hero-date" id="hero-latest-date"></span>
+        </div>
+        <div id="hero-latest-numero">
+          <!-- La card viene inserita automaticamente da app.js -->
+        </div>
+      </div>
+
+    <!-- Colonna destra: Editoriale di apertura -->
+    <div class="hero-side">
       <div class="kicker">— Editoriale di apertura</div>
       <h1>La politica si è impoverita di parole e idee.<br><em>Noi ne stiamo portando di nuove.</em></h1>
-    </div>
-    <div class="hero-side">
-      <p>L'Attivista nasce come le riviste che hanno cambiato il secolo scorso: poche pagine, idee chiare, una comunità che cresce numero dopo numero. Oggi lo facciamo su Instagram, prima di diventare qualcosa di più grande.</p>
-      <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center;">
+      
+      <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 28px;">
         <a href="#movimento" class="btn btn-red">Entra nel movimento</a>
-        <a href="#numeri" class="btn btn-outline">Leggi l'ultimo numero</a>
+        <a href="#numeri" class="btn btn-outline">Archivio articoli</a>
       </div>
     </div>
   </div>
@@ -54,21 +65,6 @@
     </div>
     <div class="manifesto-cta">
       <a href="manifesto.html" class="btn">Leggi il manifesto integrale</a>
-    </div>
-  </div>
-</section>
-
-<section class="contatti" id="contatti">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <div class="kicker">— Scrivici</div>
-        <div class="section-title">Contatti</div>
-      </div>
-    </div>
-    <div class="contatti-box">
-      <p>Hai una domanda, vuoi proporre una collaborazione o segnalarci qualcosa? Scrivici direttamente: rispondiamo a tutti.</p>
-      <a href="mailto:info@lattivista.it" class="contatti-email">info@lattivista.it</a>
     </div>
   </div>
 </section>
@@ -97,8 +93,8 @@
       <h2>Non sei un lettore.<br>Sei una firma sotto il manifesto.</h2>
       <p class="lead">Ogni numero porta in fondo i nomi di chi lo sostiene. Seguici, condividi, scrivici la tua storia: il movimento cresce con chi decide di metterci la faccia, non solo il pollice.</p>
       <div class="movimento-actions">
-        <a href="https://www.instagram.com/_lattivista/" target="_blank" rel="noopener" class="btn">Seguici su Instagram</a>
-        <a href="#contatti" class="btn btn-ghost">Scrivici</a>
+        <a href="https://www.instagram.com/_lattivista/" target="_blank" rel="noopener" class="btn">Instagram</a>
+        <a href="https://whatsapp.com/channel/0029VbCqBNJ7IUYTyqx9mj2U" target="_blank" rel="noopener" class="btn">Canale WhatsApp</a>
       </div>
     </div>
     <div class="numbers-box">
@@ -109,7 +105,7 @@
   </div>
 </section>
 
-<footer>
+<footer id="contatti">
   <div class="wrap">
     <div class="footer-grid">
       <div>
@@ -120,11 +116,12 @@
         <h5>Il foglio</h5>
         <a href="#manifesto">Il Manifesto</a>
         <a href="#numeri">Ultimi Numeri</a>
+        <a href="#movimento">Come partecipare</a>
       </div>
       <div class="footer-col">
-        <h5>Movimento</h5>
-        <a href="#movimento">Come partecipare</a>
-        <a href="#contatti">Scrivici</a>
+        <h5>Contatti</h5>
+        <p style="font-size: 13.5px; margin-bottom: 8px;">Hai una domanda, vuoi proporre una collaborazione o segnalarci qualcosa?</p>
+        <a href="mailto:info@lattivista.it" style="font-weight: 600;">info@lattivista.it</a>
       </div>
       <div class="footer-col">
         <h5>Seguici</h5>

@@ -2,13 +2,7 @@
    app.js — L'Attivista
    Script unico usato sia da index.html (carosello "Ultimi Numeri"
    + pulsante torna-su) sia da articolo.html (pagina del singolo
-   articolo). Ogni funzione controlla da sola se gli elementi che
-   le servono sono presenti in pagina, quindi puoi includere
-   questo stesso file ovunque senza effetti collaterali.
-
-   Per aggiungere un nuovo articolo: apri content/articles.json
-   e aggiungi un nuovo oggetto nell'elenco (copia uno esistente
-   come modello). Non serve toccare questo file.
+   articolo).
    ============================================================ */
 
 const ARTICLES_JSON_PATH = "content/articles.json";
@@ -20,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initArticoloPage();
 });
 
-/* ---------- Caricamento condiviso degli articoli ---------- */
+/* ---------- Caricamento indice condiviso degli articoli ---------- */
 
 async function loadArticles() {
   const res = await fetch(ARTICLES_JSON_PATH);
@@ -30,11 +24,21 @@ async function loadArticles() {
   const data = await res.json();
 
   // Filtra eventuali voci senza data valida, poi ordina dal più
-  // recente al più vecchio: è sempre la data a decidere l'ordine,
-  // indipendentemente da come sono elencati nel file JSON.
+  // recente al più vecchio.
   return data
     .filter(a => a && a.date && !isNaN(new Date(a.date)))
     .sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+/* ---------- Caricamento dinamico del singolo articolo ---------- */
+
+async function loadSingleArticleContent(id) {
+  // Cerca il file con nome corrispondente all'ID dentro la cartella content/
+  const res = await fetch(`content/${encodeURIComponent(id)}.json`);
+  if (!res.ok) {
+    throw new Error(`Impossibile trovare il file per l'articolo ID: ${id}`);
+  }
+  return await res.json();
 }
 
 function escapeHtml(str) {
@@ -49,29 +53,42 @@ function formatDataItaliana(dateStr) {
   return d.toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" });
 }
 
-/* ---------- Sezione "Gli ultimi numeri" (index.html) ---------- */
+/* ---------- Sezione "Gli ultimi numeri" & Hero (index.html) ---------- */
 
 async function initNumeriCarousel() {
   const grid = document.getElementById("numeri-grid");
-  if (!grid) return; // non siamo nella homepage, esci
+  const heroContainer = document.getElementById("hero-latest-numero");
+
+  if (!grid && !heroContainer) return; // non siamo nella homepage, esci
 
   let articles = [];
   try {
     articles = await loadArticles();
   } catch (err) {
     console.error(err);
-    grid.innerHTML = '<p class="numeri-error">Non è stato possibile caricare gli articoli al momento.</p>';
+    if (grid) grid.innerHTML = '<p class="numeri-error">Non è stato possibile caricare gli articoli al momento.</p>';
     return;
   }
+
+  // Inserisce l'articolo più recente e la sua data nella Hero
+  if (heroContainer && articles.length > 0) {
+    heroContainer.innerHTML = "";
+    heroContainer.appendChild(buildNumeroCard(articles[0]));
+
+    const dateEl = document.getElementById("hero-latest-date");
+    if (dateEl && articles[0].date) {
+      dateEl.textContent = formatDataItaliana(articles[0].date);
+    }
+  }
+
+  if (!grid) return;
 
   grid.innerHTML = "";
 
   if (articles.length > MIN_SLOTS) {
-    // Più di 3 articoli: scroll orizzontale con tutti gli articoli
     grid.classList.add("is-carousel");
     articles.forEach(article => grid.appendChild(buildNumeroCard(article)));
   } else {
-    // 3 o meno: griglia fissa, eventuali posti restano vuoti
     grid.classList.remove("is-carousel");
     articles.forEach(article => grid.appendChild(buildNumeroCard(article)));
     const postiVuoti = MIN_SLOTS - articles.length;
@@ -88,11 +105,23 @@ function buildNumeroCard(article) {
 
   const coverLines = Array.isArray(article.cover_lines) ? article.cover_lines : [article.title || ""];
   const coverHtml = coverLines.map(escapeHtml).join("<br>");
+  
+  // Percorso corretto dell'immagine
+  const imgPath = `assets/articles previews/${encodeURIComponent(article.id)}.webp`;
+
+  // Formattazione della data
+  const dateFormatted = article.date ? formatDataItaliana(article.date) : '';
 
   link.innerHTML = `
-    <div class="numero-img"><span>${coverHtml}</span></div>
+    <div class="numero-img">
+      <img src="${imgPath}" alt="${escapeHtml(article.title)}" loading="lazy" onerror="this.style.display='none';">
+      <span>${coverHtml}</span>
+    </div>
     <div class="numero-body">
-      <div class="numero-tag">${escapeHtml(article.tag)}</div>
+      <div class="numero-card-meta">
+        <span class="numero-tag">${escapeHtml(article.tag || '')}</span>
+        <span class="numero-card-date">${escapeHtml(dateFormatted)}</span>
+      </div>
       <h4>${escapeHtml(article.title)}</h4>
       <p>${escapeHtml(article.excerpt)}</p>
     </div>
@@ -129,19 +158,26 @@ async function initArticoloPage() {
   const dataEl = document.getElementById("articolo-data");
   const bodyEl = document.getElementById("articolo-body");
 
-  let articles = [];
-  try {
-    articles = await loadArticles();
-  } catch (err) {
-    console.error(err);
-    if (titoloEl) titoloEl.textContent = "Errore di caricamento";
-    if (bodyEl) bodyEl.innerHTML = "<p>Non è stato possibile caricare l'articolo. Riprova più tardi.</p>";
+  if (!id) {
+    if (titoloEl) titoloEl.textContent = "Articolo non specificato";
+    if (bodyEl) bodyEl.innerHTML = '<p><a href="index.html#numeri">Torna agli articoli →</a></p>';
     return;
   }
 
-  const article = articles.find(a => a.id === id);
+  let indexArticles = [];
+  try {
+    // 1. Carica le informazioni generali dall'indice
+    indexArticles = await loadArticles();
+  } catch (err) {
+    console.error(err);
+    if (titoloEl) titoloEl.textContent = "Errore di caricamento";
+    if (bodyEl) bodyEl.innerHTML = "<p>Non è stato possibile caricare l'indice degli articoli.</p>";
+    return;
+  }
 
-  if (!article) {
+  const meta = indexArticles.find(a => a.id === id);
+
+  if (!meta) {
     if (titoloEl) titoloEl.textContent = "Articolo non trovato";
     if (kickerEl) kickerEl.textContent = "— 404";
     if (dekEl) dekEl.textContent = "";
@@ -150,19 +186,35 @@ async function initArticoloPage() {
     return;
   }
 
-  document.title = `${article.title} — L'Attivista`;
-  if (kickerEl) kickerEl.textContent = `— ${article.tag}`;
-  if (titoloEl) titoloEl.textContent = article.title;
-  if (dekEl) dekEl.textContent = article.excerpt || "";
-  if (dataEl) dataEl.textContent = formatDataItaliana(article.date);
+  // Popola l'intestazione subito con i metadati leggeri
+  document.title = `${meta.title} — L'Attivista`;
+  if (kickerEl) kickerEl.textContent = `— ${meta.tag}`;
+  if (titoloEl) titoloEl.textContent = meta.title;
+  if (dekEl) dekEl.textContent = meta.excerpt || "";
+  if (dataEl) dataEl.textContent = formatDataItaliana(meta.date);
 
-  if (bodyEl) {
-    bodyEl.innerHTML = "";
-    (article.body || []).forEach(paragrafo => {
-      const p = document.createElement("p");
-      p.textContent = paragrafo;
-      bodyEl.appendChild(p);
-    });
+  // 2. Carica in modo asincrono solo il file specifico con il corpo dell'articolo (content/<id>.json)
+  try {
+    const articleData = await loadSingleArticleContent(id);
+    
+    if (bodyEl) {
+      bodyEl.innerHTML = "";
+      
+      // Supporta sia l'array di paragrafi "body": ["...", "..."] 
+      // sia una stringa HTML diretta "content": "<p>..."
+      if (Array.isArray(articleData.body)) {
+        articleData.body.forEach(paragrafo => {
+          const p = document.createElement("p");
+          p.textContent = paragrafo;
+          bodyEl.appendChild(p);
+        });
+      } else if (articleData.content) {
+        bodyEl.innerHTML = articleData.content;
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    if (bodyEl) bodyEl.innerHTML = "<p>Impossibile caricare il testo completo dell'articolo.</p>";
   }
 }
 
@@ -172,7 +224,7 @@ function initBackToTop() {
   const btn = document.getElementById("back-to-top");
   if (!btn) return;
 
-  const SOGLIA_SCROLL = 420; // px scesi prima che il pulsante compaia
+  const SOGLIA_SCROLL = 420;
 
   const aggiornaVisibilita = () => {
     if (window.scrollY > SOGLIA_SCROLL) {
