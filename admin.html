@@ -245,12 +245,12 @@
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div class="control-item">
-                        <label>ID Articolo (Senza spazi)</label>
-                        <input type="text" id="art-id" class="text-input" placeholder="es. il-nuovo-pensiero">
+                        <label>ID Articolo (Slug senza spazi)</label>
+                        <input type="text" id="art-id" class="text-input" placeholder="es. test-article-preview">
                     </div>
                     <div class="control-item">
-                        <label>TAG Articolo</label>
-                        <input type="text" id="art-tag" class="text-input" placeholder="es. EDITORIALE">
+                        <label>Tag / Categoria</label>
+                        <input type="text" id="art-tag" class="text-input" placeholder="es. Tag Articolo">
                     </div>
                 </div>
 
@@ -260,14 +260,14 @@
                         <input type="text" id="art-title" class="text-input" placeholder="Titolo dell'articolo">
                     </div>
                     <div class="control-item">
-                        <label>Data Pubblicazione (DD-MM-YYYY)</label>
+                        <label>Data Pubblicazione (YYYY-MM-DD)</label>
                         <input type="date" id="art-date" class="text-input">
                     </div>
                 </div>
 
                 <div class="control-item">
-                    <label>Breve Descrizione</label>
-                    <textarea id="art-excerpt" placeholder="Piccola descrizione veloce dell'articolo visibile nella preview..."></textarea>
+                    <label>Estratto / Excerpt (Breve descrizione)</label>
+                    <textarea id="art-excerpt" placeholder="Piccola descrizione veloce dell'articolo..."></textarea>
                 </div>
 
                 <div class="control-item">
@@ -277,10 +277,13 @@
             </fieldset>
 
             <fieldset class="control-group">
-                <legend>02 // CONTENUTO HTML ARTICOLO</legend>
+                <legend>02 // CONTENUTO ARTICOLO (PARAGRAFI)</legend>
                 <div class="control-item">
-                    <label>Testo o Struttura HTML dell'Articolo</label>
-                    <textarea id="art-content" style="min-height: 220px;" placeholder="<p>Scrivi il contenuto dell'articolo qui...</p>"></textarea>
+                    <label>Testo dell'Articolo (Un paragrafo per riga o separati da invio)</label>
+                    <textarea id="art-content" style="min-height: 220px;" placeholder="Questo è il primo paragrafo dell'articolo.&#10;&#10;Questo è il secondo paragrafo dell'articolo.&#10;&#10;test riga 3"></textarea>
+                </div>
+                <div class="info-note">
+                    💡 Ogni riga/blocco di testo verrà convertito automaticamente in un elemento nell'array "body" del file JSON.
                 </div>
             </fieldset>
         </div>
@@ -297,7 +300,7 @@
                 <button id="select-img-btn" class="action-btn">SELEZIONA IMMAGINE</button>
                 <input type="file" id="img-file-input" accept="image/*" class="hidden">
                 <div class="info-note">
-                    💡 L'immagine deve essere 800px per 1000px
+                    💡 Verrà convertita automaticamente in formato <b>.webp</b>
                 </div>
             </fieldset>
 
@@ -394,7 +397,6 @@
                     previewImg.src = webpDataUrl;
                     previewImg.classList.remove('hidden');
                     
-                    // Estrae stringa base64 pura
                     selectedWebpBase64 = webpDataUrl.split(',')[1];
                     log("Immagine convertita in WebP con successo.");
                 };
@@ -444,19 +446,19 @@
             const date = document.getElementById('art-date').value;
             const excerpt = document.getElementById('art-excerpt').value.trim();
             const coverLinesText = document.getElementById('art-cover-lines').value.trim();
-            const contentHtml = document.getElementById('art-content').value.trim();
+            const rawContent = document.getElementById('art-content').value.trim();
 
             if (!id || !title) {
                 alert("Compila almeno ID e Titolo!");
                 return;
             }
 
-            const coverLines = coverLinesText ? coverLinesText.split('\n').map(l => l.trim()) : [title];
+            const coverLines = coverLinesText ? coverLinesText.split('\n').map(l => l.trim()).filter(Boolean) : [title];
 
             try {
-                log("--> Inizio processo di pubblicazione per: " + id);
+                log("--> Inizio pubblicazione per: " + id);
 
-                // 1. Carica / Aggiorna la Preview Image se presente
+                // 1. Carica / Aggiorna l'immagine preview
                 if (selectedWebpBase64) {
                     log("Upload immagine preview WebP...");
                     const imgPath = `assets/articles previews/${id}.webp`;
@@ -471,24 +473,34 @@
                     log("✓ Immagine caricata in assets/articles previews/" + id + ".webp");
                 }
 
-                // 2. Carica / Aggiorna l'eventuale file HTML/Contenuto articolo dedicato
-                if (contentHtml) {
-                    log("Upload file contenuto articolo...");
-                    const contentPath = `articoli/${id}.html`;
+                // 2. Creazione e Upload del JSON dell'articolo in content/{id}.json
+                if (rawContent) {
+                    log("Formattazione paragrafi...");
+                    const paragraphs = rawContent.split(/\n+/).map(p => p.trim()).filter(Boolean);
+                    
+                    const articleJsonObj = {
+                        id: id,
+                        body: paragraphs
+                    };
+
+                    const contentPath = `content/${id}.json`;
+                    log(`Upload file articolo in ${contentPath}...`);
+                    
                     const existingFile = await githubApi(contentPath);
 
                     await githubApi(contentPath, 'PUT', {
                         message: `Aggiornato contenuto articolo ${id}`,
-                        content: utf8ToBase64(contentHtml),
+                        content: utf8ToBase64(JSON.stringify(articleJsonObj, null, 2)),
                         sha: existingFile ? existingFile.sha : undefined,
                         branch: config.branch
                     });
-                    log("✓ Contenuto file creato in articoli/" + id + ".html");
+                    log(`✓ Contenuto creato/aggiornato in ${contentPath}`);
                 }
 
-                // 3. Scarica, aggiorna e salva articles.json
-                log("Lettura articles.json...");
-                const jsonFile = await githubApi("articles.json");
+                // 3. Lettura, aggiornamento e salvataggio di content/articles.json
+                log("Lettura content/articles.json...");
+                const jsonPath = "content/articles.json";
+                const jsonFile = await githubApi(jsonPath);
                 let articles = [];
 
                 if (jsonFile) {
@@ -496,27 +508,27 @@
                     articles = JSON.parse(rawJson);
                 }
 
-                const newArticle = {
+                const newArticleEntry = {
                     id,
                     title,
                     tag,
-                    date,
                     excerpt,
-                    cover_lines: coverLines
+                    cover_lines: coverLines,
+                    date
                 };
 
-                // Sostituisce se existe, altrimenti aggiunge in cima
+                // Aggiorna se già esistente, altrimenti aggiunge in testa mantenendo gli altri
                 const existingIdx = articles.findIndex(a => a.id === id);
                 if (existingIdx >= 0) {
-                    articles[existingIdx] = newArticle;
-                    log("Articolo esistente aggiornato nella lista.");
+                    articles[existingIdx] = newArticleEntry;
+                    log("Articolo esistente aggiornato nel registro.");
                 } else {
-                    articles.unshift(newArticle);
-                    log("Nuovo articolo inserito in cima alla lista.");
+                    articles.unshift(newArticleEntry);
+                    log("Nuovo articolo aggiunto in cima al registro.");
                 }
 
-                log("Commit di articles.json...");
-                await githubApi("articles.json", 'PUT', {
+                log("Commit di " + jsonPath + "...");
+                await githubApi(jsonPath, 'PUT', {
                     message: `Aggiornato articles.json con l'articolo: ${id}`,
                     content: utf8ToBase64(JSON.stringify(articles, null, 2)),
                     sha: jsonFile ? jsonFile.sha : undefined,
