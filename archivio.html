@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archivio — L'Attivista</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="masthead-top">
+      <div>Anno I &nbsp;·&nbsp; Numero 01 &nbsp;·&nbsp; <span class="tag">Edizione digitale</span></div>
+      <div>Fondato nel 2026 -In un mondo da cambiare</div>
+    </div>
+    <div class="masthead-title-row">
+      <a href="index.html" class="masthead-title" style="text-decoration:none; color:inherit;">L'Attivista</a>
+      <div class="masthead-sub">Foglio del nuovo pensiero politico</div>
+    </div>
+  </div>
+  <div class="rule-double"></div>
+  <div class="wrap">
+    <nav class="mainnav">
+      <a href="index.html#manifesto">Il Manifesto</a>
+      <a href="index.html#numeri">Ultimi Numeri</a>
+      <a href="archivio.html">Archivio Articoli</a>
+      <a href="index.html#movimento">Il Movimento</a>
+    </nav>
+  </div>
+</header>
+
+<section class="archivio-hero">
+  <div class="wrap">
+    <div class="kicker">— Archivio</div>
+    <h1 class="archivio-title">Tutti i numeri</h1>
+    <p class="archivio-dek">Ogni articolo pubblicato da L'Attivista, in un unico spazio. Cerca per titolo o filtra per categoria.</p>
+  </div>
+</section>
+
+<section class="archivio-controls-section">
+  <div class="wrap">
+    <div class="archivio-controls">
+      <div class="archivio-search-wrap">
+        <input
+          type="text"
+          id="archivio-search"
+          class="archivio-search"
+          placeholder="Cerca un articolo per titolo… (minimo 4 caratteri)"
+          autocomplete="off"
+        >
+      </div>
+      <div class="archivio-select-wrap">
+        <select id="archivio-tag" class="archivio-select" aria-label="Filtra per categoria">
+          <option value="">Tutte le categorie</option>
+          <!-- Le opzioni vengono generate automaticamente da archivio.js
+               in base ai tag presenti in content/articles.json. -->
+        </select>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="archivio-list">
+  <div class="wrap">
+    <div class="numeri-grid archivio-grid" id="archivio-grid">
+      <!-- Le card degli articoli vengono generate automaticamente da
+           archivio.js, leggendo da content/articles.json e caricandole
+           a blocchi mano a mano che si scorre la pagina. Non modificare
+           questa parte a mano. -->
+    </div>
+  </div>
+</section>
+
+<footer id="contatti">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-title">L'Attivista</div>
+        <p>Foglio indipendente di opinione e cultura politica. Nato online, scritto da chi crede che capire sia il primo atto politico.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Il foglio</h5>
+        <a href="index.html#manifesto">Il Manifesto</a>
+        <a href="index.html#numeri">Ultimi Numeri</a>
+        <a href="index.html#movimento">Come partecipare</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contatti</h5>
+        <p style="font-size: 13.5px; margin-bottom: 8px;">Hai una domanda, vuoi proporre una collaborazione o segnalarci qualcosa?</p>
+        <a href="mailto:info@lattivista.it" style="font-weight: 600;">info@lattivista.it</a>
+      </div>
+      <div class="footer-col">
+        <h5>Seguici</h5>
+        <a href="https://www.instagram.com/_lattivista/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://whatsapp.com/channel/0029VbCqBNJ7IUYTyqx9mj2U" target="_blank" rel="noopener">Canale WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 L'Attivista — Tutti i diritti riservati</span>
+      <span>Indipendenti per scelta editoriale</span>
+    </div>
+  </div>
+</footer>
+
+<button id="back-to-top" aria-label="Torna in cima alla pagina" title="Torna in cima">↑</button>
+
+<script src="app.js" defer></script>
+<script src="archivio.js" defer></script>
+</body>
+</html>
