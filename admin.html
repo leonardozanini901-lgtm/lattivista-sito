@@ -160,16 +160,17 @@
             object-fit: cover;
         }
 
-        /* CONSOLE LOG */
+        /* CONSOLE LOG COLORATA */
         #console-log {
             background: #000000;
             border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 12px;
             font-size: 10px;
-            height: 160px;
+            height: 180px;
             overflow-y: auto;
-            color: #00ffaa;
-            white-space: pre-wrap;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
             word-break: break-all;
         }
 
@@ -279,11 +280,11 @@
             <fieldset class="control-group">
                 <legend>02 // CONTENUTO ARTICOLO (PARAGRAFI)</legend>
                 <div class="control-item">
-                    <label>Testo dell'Articolo (Un paragrafo per riga o separati da invio)</label>
-                    <textarea id="art-content" style="min-height: 220px;" placeholder="Questo è il primo paragrafo dell'articolo.&#10;&#10;Questo è il secondo paragrafo dell'articolo.&#10;&#10;test riga 3"></textarea>
+                    <label>Testo dell'Articolo</label>
+                    <textarea id="art-content" style="min-height: 220px;" placeholder="Questo è il primo paragrafo dell'articolo.&#10;&#10;Questo è il secondo paragrafo dell'articolo."></textarea>
                 </div>
                 <div class="info-note">
-                    💡 Ogni riga/blocco di testo verrà convertito automaticamente in un elemento nell'array "body" del file JSON.
+                    💡 Gli invii a capo doppi generano righe vuote nell'array "body" per preservare la spaziatura nell'articolo finale.
                 </div>
             </fieldset>
         </div>
@@ -311,7 +312,7 @@
 
             <fieldset class="control-group">
                 <legend>CONSOLE LOG // REQUISITI & STATUS</legend>
-                <div id="console-log">In attesa di connessione API...</div>
+                <div id="console-log"></div>
             </fieldset>
         </div>
 
@@ -330,11 +331,25 @@
         const consoleLog = document.getElementById('console-log');
         const previewImg = document.getElementById('preview-img');
 
-        function log(msg) {
+        // Funzione Log Colorata (type: 'info' | 'success' | 'error')
+        function log(msg, type = 'info') {
             const time = new Date().toLocaleTimeString();
-            consoleLog.innerHTML += `\n[${time}] ${msg}`;
+            const line = document.createElement('div');
+
+            if (type === 'success') {
+                line.style.color = '#00ffaa'; // Verde
+            } else if (type === 'error') {
+                line.style.color = '#ff4d4d'; // Rosso
+            } else {
+                line.style.color = '#ffffff'; // Bianco
+            }
+
+            line.textContent = `[${time}] ${msg}`;
+            consoleLog.appendChild(line);
             consoleLog.scrollTop = consoleLog.scrollHeight;
         }
+
+        log("In attesa di connessione API...", "info");
 
         // Carica Credenziali salvate
         window.addEventListener('DOMContentLoaded', () => {
@@ -346,7 +361,7 @@
                 document.getElementById('cfg-repo').value = config.repo;
                 document.getElementById('cfg-branch').value = config.branch || 'main';
                 authModal.classList.add('hidden');
-                log("Connesso a " + config.owner + "/" + config.repo);
+                log("Connesso a " + config.owner + "/" + config.repo, "success");
             }
         });
 
@@ -358,19 +373,19 @@
             config.branch = document.getElementById('cfg-branch').value.trim() || 'main';
 
             if (!config.token || !config.owner || !config.repo) {
-                alert("Compila tutti i campi!");
+                log("ERRORE: Compila tutti i campi di autenticazione!", "error");
                 return;
             }
 
             localStorage.setItem('gh_cms_config', JSON.stringify(config));
             authModal.classList.add('hidden');
-            log("Configurazione salvata. Pronto.");
+            log("Configurazione salvata con successo. Pronto.", "success");
         });
 
         document.getElementById('logout-btn').addEventListener('click', () => {
             localStorage.removeItem('gh_cms_config');
             authModal.classList.remove('hidden');
-            log("Disconnesso.");
+            log("Disconnesso.", "info");
         });
 
         // Gestione Selezione e Conversione Immagine in WebP
@@ -398,7 +413,7 @@
                     previewImg.classList.remove('hidden');
                     
                     selectedWebpBase64 = webpDataUrl.split(',')[1];
-                    log("Immagine convertita in WebP con successo.");
+                    log("Immagine convertita in WebP con successo.", "success");
                 };
                 img.src = event.target.result;
             };
@@ -446,21 +461,21 @@
             const date = document.getElementById('art-date').value;
             const excerpt = document.getElementById('art-excerpt').value.trim();
             const coverLinesText = document.getElementById('art-cover-lines').value.trim();
-            const rawContent = document.getElementById('art-content').value.trim();
+            const rawContent = document.getElementById('art-content').value;
 
             if (!id || !title) {
-                alert("Compila almeno ID e Titolo!");
+                log("ERRORE: Compila almeno i campi ID e Titolo!", "error");
                 return;
             }
 
             const coverLines = coverLinesText ? coverLinesText.split('\n').map(l => l.trim()).filter(Boolean) : [title];
 
             try {
-                log("--> Inizio pubblicazione per: " + id);
+                log("--> Inizio processo di pubblicazione per: " + id, "info");
 
                 // 1. Carica / Aggiorna l'immagine preview
                 if (selectedWebpBase64) {
-                    log("Upload immagine preview WebP...");
+                    log("Upload immagine preview WebP...", "info");
                     const imgPath = `assets/articles previews/${id}.webp`;
                     const existingImg = await githubApi(imgPath);
 
@@ -470,21 +485,27 @@
                         sha: existingImg ? existingImg.sha : undefined,
                         branch: config.branch
                     });
-                    log("✓ Immagine caricata in assets/articles previews/" + id + ".webp");
+                    log("✓ Immagine caricata in assets/articles previews/" + id + ".webp", "success");
                 }
 
                 // 2. Creazione e Upload del JSON dell'articolo in content/{id}.json
                 if (rawContent) {
-                    log("Formattazione paragrafi...");
-                    const paragraphs = rawContent.split(/\n+/).map(p => p.trim()).filter(Boolean);
+                    log("Formattazione paragrafi...", "info");
                     
+                    // Mantiene le righe vuote ("") derivate dai doppi invi a capo
+                    let paragraphs = rawContent.split(/\r?\n/).map(p => p.trim());
+                    
+                    // Rimuove eventuali righe vuote superflue solo all'inizio o alla fine del testo
+                    while (paragraphs.length > 0 && paragraphs[0] === "") paragraphs.shift();
+                    while (paragraphs.length > 0 && paragraphs[paragraphs.length - 1] === "") paragraphs.pop();
+
                     const articleJsonObj = {
                         id: id,
                         body: paragraphs
                     };
 
                     const contentPath = `content/${id}.json`;
-                    log(`Upload file articolo in ${contentPath}...`);
+                    log(`Upload file articolo in ${contentPath}...`, "info");
                     
                     const existingFile = await githubApi(contentPath);
 
@@ -494,11 +515,11 @@
                         sha: existingFile ? existingFile.sha : undefined,
                         branch: config.branch
                     });
-                    log(`✓ Contenuto creato/aggiornato in ${contentPath}`);
+                    log(`✓ Contenuto creato/aggiornato in ${contentPath}`, "success");
                 }
 
                 // 3. Lettura, aggiornamento e salvataggio di content/articles.json
-                log("Lettura content/articles.json...");
+                log("Lettura content/articles.json...", "info");
                 const jsonPath = "content/articles.json";
                 const jsonFile = await githubApi(jsonPath);
                 let articles = [];
@@ -517,17 +538,17 @@
                     date
                 };
 
-                // Aggiorna se già esistente, altrimenti aggiunge in testa mantenendo gli altri
+                // Aggiorna se già esistente, altrimenti aggiunge in testa
                 const existingIdx = articles.findIndex(a => a.id === id);
                 if (existingIdx >= 0) {
                     articles[existingIdx] = newArticleEntry;
-                    log("Articolo esistente aggiornato nel registro.");
+                    log("Articolo esistente aggiornato nel registro.", "info");
                 } else {
                     articles.unshift(newArticleEntry);
-                    log("Nuovo articolo aggiunto in cima al registro.");
+                    log("Nuovo articolo aggiunto in cima al registro.", "info");
                 }
 
-                log("Commit di " + jsonPath + "...");
+                log("Commit di " + jsonPath + "...", "info");
                 await githubApi(jsonPath, 'PUT', {
                     message: `Aggiornato articles.json con l'articolo: ${id}`,
                     content: utf8ToBase64(JSON.stringify(articles, null, 2)),
@@ -535,12 +556,10 @@
                     branch: config.branch
                 });
 
-                log("🎉 PUBBLICAZIONE COMPLETATA CON SUCCESSO!");
-                alert("Articolo pubblicato con successo!");
+                log("PUBBLICAZIONE COMPLETATA CON SUCCESSO!", "success");
 
             } catch (err) {
-                log("❌ ERRORE: " + err.message);
-                alert("Errore durante la pubblicazione: " + err.message);
+                log("❌ ERRORE: " + err.message, "error");
             }
         });
     </script>
