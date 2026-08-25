@@ -193,6 +193,8 @@ async function initArticoloPage() {
   if (dekEl) dekEl.textContent = meta.excerpt || "";
   if (dataEl) dataEl.textContent = formatDataItaliana(meta.date);
 
+  initArticoloHeroBackground(id);
+
   // 2. Carica in modo asincrono solo il file specifico con il corpo dell'articolo (content/<id>.json)
   try {
     const articleData = await loadSingleArticleContent(id);
@@ -216,6 +218,44 @@ async function initArticoloPage() {
     console.error(err);
     if (bodyEl) bodyEl.innerHTML = "<p>Impossibile caricare il testo completo dell'articolo.</p>";
   }
+}
+
+/* ---------- Sfondo-copertina dietro al titolo (articolo.html) ---------- */
+
+const ARTICOLO_HERO_BASE_OPACITY = 0.55;
+const ARTICOLO_HERO_COLLAPSE_DISTANCE = 280; // px di scroll dopo cui l'immagine è sparita
+
+function initArticoloHeroBackground(id) {
+  const heroBgEl = document.getElementById("articolo-hero-bg");
+  if (!heroBgEl) return;
+
+  const imgPath = `assets/articles previews/${encodeURIComponent(id)}.webp`;
+
+  // Precarica l'immagine: se non esiste, lo sfondo resta semplicemente
+  // invisibile (nessun segnaposto rotto dietro al titolo).
+  const preload = new Image();
+  preload.onload = () => {
+    heroBgEl.style.backgroundImage = `url("${imgPath}")`;
+    // Un frame di ritardo per far scattare la transizione di opacità già definita in CSS
+    requestAnimationFrame(() => {
+      heroBgEl.style.opacity = String(ARTICOLO_HERO_BASE_OPACITY);
+    });
+    initArticoloHeroScroll(heroBgEl);
+  };
+  preload.onerror = () => {
+    heroBgEl.style.display = "none";
+  };
+  preload.src = imgPath;
+}
+
+function initArticoloHeroScroll(heroBgEl) {
+  const onScroll = () => {
+    const progress = Math.min(window.scrollY / ARTICOLO_HERO_COLLAPSE_DISTANCE, 1);
+    heroBgEl.style.opacity = String(ARTICOLO_HERO_BASE_OPACITY * (1 - progress));
+    heroBgEl.style.transform = `scale(${1.18 + progress * 0.1}) translateY(${progress * -24}px)`;
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 }
 
 /* ---------- Pulsante "torna in cima" (index.html) ---------- */
