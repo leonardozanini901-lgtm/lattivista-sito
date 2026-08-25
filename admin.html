@@ -40,13 +40,13 @@
             color: #00ffaa;
         }
 
-        /* LAYOUT MAIN */
+        /* LAYOUT MAIN A 3 COLONNE */
         .main-container {
             display: grid;
-            grid-template-columns: 1fr 380px;
+            grid-template-columns: 280px 1fr 380px;
             gap: 20px;
             padding: 24px;
-            max-width: 1400px;
+            max-width: 1650px;
             margin: 0 auto;
             width: 100%;
             flex-grow: 1;
@@ -139,6 +139,84 @@
             color: rgba(255, 255, 255, 0.45);
             border-left: 2px solid rgba(255, 255, 255, 0.2);
             padding-left: 8px;
+        }
+
+        /* ARCHIVIO ARTICOLI (PANNELLO SINISTRO) */
+        #articles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: calc(100vh - 220px);
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .art-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .art-card:hover {
+            border-color: #00ffaa;
+            background: rgba(0, 255, 170, 0.05);
+        }
+
+        .art-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+
+        .art-card-title {
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .art-card-meta {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* PULSANTE ELIMINA ARTICOLO */
+        .delete-art-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            color: #ff4d4d;
+            padding: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .delete-art-btn:hover {
+            background: #ff4d4d;
+            color: #000000;
+            border-color: #ff4d4d;
+        }
+
+        .delete-art-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
         }
 
         /* PREVIEW CONTAINER */
@@ -239,18 +317,27 @@
     <!-- MAIN WORKSPACE -->
     <main class="main-container">
         
-        <!-- COLONNA SINISTRA: EDITA ARTICOLO -->
+        <!-- COLONNA 1: ARCHIVIO ARTICOLI -->
+        <fieldset class="control-group" style="height: 100%;">
+            <legend>00 // ARCHIVIO ARTICOLI</legend>
+            <button id="refresh-list-btn" class="action-btn" style="padding: 6px; font-size: 9px; margin-bottom: 8px;">AGGIORNA LISTA</button>
+            <div id="articles-list">
+                <div class="info-note">In attesa di connessione...</div>
+            </div>
+        </fieldset>
+
+        <!-- COLONNA 2: EDITA ARTICOLO -->
         <div style="display: flex; flex-direction: column; gap: 20px;">
             <fieldset class="control-group">
                 <legend>01 // METADATI ARTICOLO</legend>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div class="control-item">
-                        <label>ID Articolo (Slug senza spazi)</label>
+                        <label>ID Articolo (Senza spazi)</label>
                         <input type="text" id="art-id" class="text-input" placeholder="es. test-article-preview">
                     </div>
                     <div class="control-item">
-                        <label>Tag / Categoria</label>
+                        <label>TAG</label>
                         <input type="text" id="art-tag" class="text-input" placeholder="es. Tag Articolo">
                     </div>
                 </div>
@@ -261,13 +348,13 @@
                         <input type="text" id="art-title" class="text-input" placeholder="Titolo dell'articolo">
                     </div>
                     <div class="control-item">
-                        <label>Data Pubblicazione (YYYY-MM-DD)</label>
+                        <label>Data Pubblicazione (DD-MM-YYYY)</label>
                         <input type="date" id="art-date" class="text-input">
                     </div>
                 </div>
 
                 <div class="control-item">
-                    <label>Estratto / Excerpt (Breve descrizione)</label>
+                    <label>Breve descrizione</label>
                     <textarea id="art-excerpt" placeholder="Piccola descrizione veloce dell'articolo..."></textarea>
                 </div>
 
@@ -289,7 +376,7 @@
             </fieldset>
         </div>
 
-        <!-- COLONNA DESTRA: PREVIEW IMMAGINE & COMMIT -->
+        <!-- COLONNA 3: PREVIEW IMMAGINE & COMMIT -->
         <div style="display: flex; flex-direction: column; gap: 20px;">
             
             <fieldset class="control-group">
@@ -330,6 +417,7 @@
         const authModal = document.getElementById('auth-modal');
         const consoleLog = document.getElementById('console-log');
         const previewImg = document.getElementById('preview-img');
+        const articlesListEl = document.getElementById('articles-list');
 
         // Funzione Log Colorata (type: 'info' | 'success' | 'error')
         function log(msg, type = 'info') {
@@ -362,6 +450,7 @@
                 document.getElementById('cfg-branch').value = config.branch || 'main';
                 authModal.classList.add('hidden');
                 log("Connesso a " + config.owner + "/" + config.repo, "success");
+                loadArticlesList();
             }
         });
 
@@ -380,6 +469,7 @@
             localStorage.setItem('gh_cms_config', JSON.stringify(config));
             authModal.classList.add('hidden');
             log("Configurazione salvata con successo. Pronto.", "success");
+            loadArticlesList();
         });
 
         document.getElementById('logout-btn').addEventListener('click', () => {
@@ -453,6 +543,170 @@
             }).join(''));
         }
 
+        // Caricamento Lista Articoli da articles.json
+        async function loadArticlesList() {
+            articlesListEl.innerHTML = '<div class="info-note">Caricamento archivio...</div>';
+            try {
+                const jsonFile = await githubApi('content/articles.json');
+                if (!jsonFile) {
+                    articlesListEl.innerHTML = '<div class="info-note">content/articles.json non trovato.</div>';
+                    return;
+                }
+
+                const rawJson = base64ToUtf8(jsonFile.content);
+                const articles = JSON.parse(rawJson);
+
+                if (!articles || articles.length === 0) {
+                    articlesListEl.innerHTML = '<div class="info-note">Nessun articolo presente.</div>';
+                    return;
+                }
+
+                articlesListEl.innerHTML = '';
+                articles.forEach(art => {
+                    const card = document.createElement('div');
+                    card.className = 'art-card';
+                    card.innerHTML = `
+                        <div class="art-card-info">
+                            <div class="art-card-title">${art.title || art.id}</div>
+                            <div class="art-card-meta">
+                                <span>${art.id}</span>
+                                <span>${art.date || ''}</span>
+                            </div>
+                        </div>
+                        <button class="delete-art-btn" title="Elimina articolo">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                        </button>
+                    `;
+                    
+                    // Click su card carica articolo
+                    card.addEventListener('click', () => loadArticleIntoForm(art));
+
+                    // Click sul pulsante elimina
+                    const delBtn = card.querySelector('.delete-art-btn');
+                    delBtn.addEventListener('click', (e) => deleteArticle(art, e));
+
+                    articlesListEl.appendChild(card);
+                });
+
+                log(`Archivio aggiornato (${articles.length} articoli).`, "info");
+            } catch (err) {
+                articlesListEl.innerHTML = '<div class="info-note" style="color:#ff4d4d;">Errore caricamento lista.</div>';
+                log("ERRORE caricamento archivio: " + err.message, "error");
+            }
+        }
+
+        // Funzione per Eliminare un Articolo con conferma
+        async function deleteArticle(art, event) {
+            event.stopPropagation(); // Evita l'apertura dell'articolo nel form
+
+            const confirmed = confirm(`Sei sicuro di voler eliminare l'articolo "${art.title || art.id}"?\n\nQuesta azione rimuoverà permanentemente il contenuto JSON e la copertina dal repository.`);
+            if (!confirmed) return;
+
+            try {
+                log(`--> Inizio eliminazione articolo: ${art.id}...`, "info");
+
+                // 1. Elimina file content/{id}.json se presente
+                const contentFile = await githubApi(`content/${art.id}.json`);
+                if (contentFile && contentFile.sha) {
+                    await githubApi(`content/${art.id}.json`, 'DELETE', {
+                        message: `Eliminato articolo ${art.id}`,
+                        sha: contentFile.sha,
+                        branch: config.branch
+                    });
+                    log(`✓ Rimosso content/${art.id}.json`, "success");
+                }
+
+                // 2. Elimina immagine assets/articles previews/{id}.webp se presente
+                const imgFile = await githubApi(`assets/articles previews/${art.id}.webp`);
+                if (imgFile && imgFile.sha) {
+                    await githubApi(`assets/articles previews/${art.id}.webp`, 'DELETE', {
+                        message: `Eliminata preview per ${art.id}`,
+                        sha: imgFile.sha,
+                        branch: config.branch
+                    });
+                    log(`✓ Rimossa copertina assets/articles previews/${art.id}.webp`, "success");
+                }
+
+                // 3. Rimuovi dall'array in content/articles.json
+                const jsonPath = "content/articles.json";
+                const jsonFile = await githubApi(jsonPath);
+                if (jsonFile) {
+                    const rawJson = base64ToUtf8(jsonFile.content);
+                    let articles = JSON.parse(rawJson);
+                    articles = articles.filter(a => a.id !== art.id);
+
+                    await githubApi(jsonPath, 'PUT', {
+                        message: `Rimosso ${art.id} da articles.json`,
+                        content: utf8ToBase64(JSON.stringify(articles, null, 2)),
+                        sha: jsonFile.sha,
+                        branch: config.branch
+                    });
+                    log(`✓ Registro articles.json aggiornato.`, "success");
+                }
+
+                log(`ARTICOLO ${art.id} ELIMINATO CON SUCCESSO!`, "success");
+                
+                // Ricarica la lista aggiornata
+                loadArticlesList();
+
+            } catch (err) {
+                log(`ERRORE durante l'eliminazione di ${art.id}: ` + err.message, "error");
+            }
+        }
+
+        // Precompila il form cliccando su un articolo dell'archivio
+        async function loadArticleIntoForm(art) {
+            document.getElementById('art-id').value = art.id || '';
+            document.getElementById('art-title').value = art.title || '';
+            document.getElementById('art-tag').value = art.tag || '';
+            document.getElementById('art-date').value = art.date || new Date().toISOString().split('T')[0];
+            document.getElementById('art-excerpt').value = art.excerpt || '';
+            document.getElementById('art-cover-lines').value = art.cover_lines ? art.cover_lines.join('\n') : '';
+
+            // Reset box immagine di anteprima
+            selectedWebpBase64 = null;
+            previewImg.src = '';
+            previewImg.classList.add('hidden');
+
+            log(`Caricamento dati per l'articolo "${art.id}"...`, "info");
+
+            // 1. Caricamento Immagine di Copertina (.webp) se presente nel repository
+            try {
+                const imgFile = await githubApi(`assets/articles previews/${art.id}.webp`);
+                if (imgFile && imgFile.content) {
+                    const cleanBase64 = imgFile.content.replace(/\s/g, '');
+                    previewImg.src = `data:image/webp;base64,${cleanBase64}`;
+                    previewImg.classList.remove('hidden');
+                    log(`✓ Copertina di "${art.id}" caricata con successo.`, "info");
+                }
+            } catch (imgErr) {
+                log(`Nessuna copertina trovata per "${art.id}".`, "info");
+            }
+
+            // 2. Caricamento Testo/Contenuto dell'Articolo
+            try {
+                const contentFile = await githubApi(`content/${art.id}.json`);
+                if (contentFile) {
+                    const contentJson = JSON.parse(base64ToUtf8(contentFile.content));
+                    if (contentJson && contentJson.body) {
+                        document.getElementById('art-content').value = contentJson.body.join('\n');
+                    }
+                } else {
+                    document.getElementById('art-content').value = '';
+                }
+                log(`Articolo "${art.id}" pronto per la modifica.`, "success");
+            } catch (err) {
+                log(`Impossibile leggere il file content/${art.id}.json`, "error");
+            }
+        }
+
+        document.getElementById('refresh-list-btn').addEventListener('click', loadArticlesList);
+
         // Workflow di Pubblicazione
         document.getElementById('publish-btn').addEventListener('click', async () => {
             const id = document.getElementById('art-id').value.trim();
@@ -473,7 +727,7 @@
             try {
                 log("--> Inizio processo di pubblicazione per: " + id, "info");
 
-                // 1. Carica / Aggiorna l'immagine preview
+                // 1. Carica / Aggiorna l'immagine preview se ne è stata selezionata una nuova
                 if (selectedWebpBase64) {
                     log("Upload immagine preview WebP...", "info");
                     const imgPath = `assets/articles previews/${id}.webp`;
@@ -492,10 +746,8 @@
                 if (rawContent) {
                     log("Formattazione paragrafi...", "info");
                     
-                    // Mantiene le righe vuote ("") derivate dai doppi invi a capo
                     let paragraphs = rawContent.split(/\r?\n/).map(p => p.trim());
                     
-                    // Rimuove eventuali righe vuote superflue solo all'inizio o alla fine del testo
                     while (paragraphs.length > 0 && paragraphs[0] === "") paragraphs.shift();
                     while (paragraphs.length > 0 && paragraphs[paragraphs.length - 1] === "") paragraphs.pop();
 
@@ -538,7 +790,6 @@
                     date
                 };
 
-                // Aggiorna se già esistente, altrimenti aggiunge in testa
                 const existingIdx = articles.findIndex(a => a.id === id);
                 if (existingIdx >= 0) {
                     articles[existingIdx] = newArticleEntry;
@@ -557,9 +808,12 @@
                 });
 
                 log("PUBBLICAZIONE COMPLETATA CON SUCCESSO!", "success");
+                
+                // Aggiorna l'archivio a schermo
+                loadArticlesList();
 
             } catch (err) {
-                log("❌ ERRORE: " + err.message, "error");
+                log("ERRORE: " + err.message, "error");
             }
         });
     </script>
