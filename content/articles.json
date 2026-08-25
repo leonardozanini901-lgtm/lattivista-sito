@@ -33,17 +33,6 @@
     "date": "2026-08-22"
   },
   {
-    "id": "test-2",
-    "title": "test titolo 2",
-    "tag": "test 2",
-    "excerpt": "piccola descrizione",
-    "cover_lines": [
-      "riga 1",
-      "riga 2"
-    ],
-    "date": "2026-08-22"
-  },
-  {
     "id": "test-1",
     "title": "test titolo 1",
     "tag": "test 1",
