@@ -9,6 +9,8 @@
 </head>
 <body>
 
+<div id="read-progress"></div>
+
 <header class="masthead-sub">
   <div class="subpage-wrap masthead-row">
     <a href="index.html" class="logo-mini">L'Attivista</a>
@@ -17,18 +19,27 @@
 </header>
 
 <div class="title-block subpage-wrap" id="articolo-container">
-  <div class="articolo-hero-bg" id="articolo-hero-bg">
-    <div class="articolo-hero-overlay"></div>
-  </div>
   <div class="kicker" id="articolo-kicker">—</div>
   <h1 id="articolo-titolo">Caricamento…</h1>
   <p class="dek" id="articolo-dek"></p>
   <p class="articolo-data" id="articolo-data"></p>
 </div>
 
+<figure class="copertina subpage-wrap" id="articolo-copertina">
+  <div class="copertina-img">
+    <img id="articolo-copertina-img" src="" alt="">
+  </div>
+  <figcaption class="copertina-caption" id="articolo-copertina-caption"></figcaption>
+</figure>
+
 <div class="rule-double"></div>
 
 <article class="subpage-wrap" id="articolo-body"></article>
+
+<section class="subpage-wrap" id="articolo-correlati" style="display:none;">
+  <div class="correlati-title">— Continua a leggere</div>
+  <div class="correlati-grid" id="articolo-correlati-grid"></div>
+</section>
 
 <footer class="subpage-footer">
   <div class="subpage-wrap">

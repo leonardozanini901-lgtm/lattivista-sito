@@ -537,6 +537,55 @@ footer{
 .numero-card.is-empty .numero-img{background:var(--paper-2); background-image:none;}
 .numero-card.is-empty .numero-img span{color:var(--slate);}
 
+/* ============================================================
+   CONTROLLI DEL CAROSELLO "GLI ULTIMI NUMERI"
+   Frecce di scorrimento + indicatore della categoria della card
+   attualmente centrata. Mostrati via JS solo quando la griglia
+   è in modalità carosello (più di MIN_SLOTS articoli).
+   ============================================================ */
+.numeri-carousel-top{
+  display:flex;
+  justify-content:flex-end;
+  min-height:14px;
+  margin-top:-14px;
+}
+.numeri-tag-indicator{
+  font-family:'Space Mono', monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--red);
+  background:var(--paper-2);
+  border:1px solid var(--rule);
+  padding:5px 12px;
+}
+.numeri-carousel-wrap{position:relative;}
+.carousel-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:var(--ink);
+  color:var(--paper);
+  border:1px solid var(--ink);
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:20px;
+  line-height:1;
+  z-index:10;
+  transition:background .18s ease, color .18s ease;
+}
+.carousel-arrow:hover{background:var(--red); border-color:var(--red);}
+.carousel-arrow-left{left:-8px;}
+.carousel-arrow-right{right:-8px;}
+@media (max-width:880px){
+  .carousel-arrow{display:none !important;}
+  .numeri-tag-indicator{display:none !important;}
+}
+
 /* .numero-card{text-decoration:none; color:inherit; display:block; transition:transform .15s ease, box-shadow .15s ease;} */
 .numero-card:not(.is-empty):hover{transform:translateY(-3px);}
 
@@ -593,31 +642,126 @@ header.masthead-sub{padding:18px 0; border-bottom:1px solid var(--rule);}
 .title-block .dek{font-family:'Fraunces', serif; font-style:italic; font-size:19px; color:var(--slate); margin-top:16px; max-width:560px; margin-left:auto; margin-right:auto;}
 .articolo-data{font-family:'Space Mono', monospace; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); margin-top:16px;}
 
-/* ===== Sfondo-copertina dietro al titolo dell'articolo =====
-   Immagine di copertina sfocata e attenuata, posizionata dietro
+/* ===== Copertina nitida dell'articolo =====
+   Immagine di copertina a piena larghezza, mostrata subito sotto
    al blocco titolo. Impostata via JS (app.js) con l'immagine
-   assets/articles previews/<id>.webp; se manca resta nascosta.
-   Si dissolve/si restringe con lo scroll grazie a initArticoloHeroScroll(). */
-.articolo-hero-bg{
-  position:absolute;
-  top:-20%; left:-12%; right:-12%; bottom:-20%;
-  z-index:-2;
-  background-size:cover;
-  background-position:center;
-  filter:blur(34px) saturate(1.15) brightness(0.96);
-  transform:scale(1.18);
-  transform-origin:center top;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .35s ease-out, transform .35s ease-out, filter .35s ease-out;
-  will-change:opacity, transform;
+   assets/articles previews/<id>.webp; se manca, la sezione va
+   nascosta con display:none dallo script. */
+.copertina{margin:34px 0 6px;}
+.copertina-img{
+  width:100%;
+  aspect-ratio:16/8;
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(155deg, var(--ink) 0%, var(--slate) 100%);
 }
-.articolo-hero-overlay{
+.copertina-img img{
   position:absolute; inset:0;
-  background:linear-gradient(to bottom, rgba(241,236,221,0.5), rgba(241,236,221,0.88) 100%);
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+.copertina-img::before{
+  content:"";
+  position:absolute; top:0; left:0; right:0; height:4px;
+  background:var(--red);
+  z-index:2;
+}
+.copertina-caption{
+  font-family:'Space Mono', monospace;
+  font-size:11px;
+  letter-spacing:.03em;
+  color:var(--slate);
+  text-align:right;
+  margin-top:8px;
+}
+
+/* ===== Barra di avanzamento lettura =====
+   Sottile linea in cima alla pagina che si riempie con lo scroll.
+   Aggiornata via JS in articolo.html. */
+#read-progress{
+  position:fixed;
+  top:0; left:0;
+  height:3px;
+  width:0%;
+  background:var(--red);
+  z-index:1000;
+  transition:width .1s linear;
 }
 @media (prefers-reduced-motion: reduce){
-  .articolo-hero-bg{transition:none;}
+  #read-progress{transition:none;}
+}
+
+/* ===== Paragrafi numerati (manifesto e articoli lunghi) ===== */
+.paragrafo-numerato{
+  display:flex;
+  gap:20px;
+  align-items:flex-start;
+  margin-bottom:18px;
+}
+.numero-romano{
+  font-family:'Fraunces', serif;
+  font-style:italic;
+  font-weight:700;
+  color:var(--red);
+  font-size:20px;
+  flex-shrink:0;
+  width:28px;
+}
+.paragrafo-numerato p{margin-bottom:0;}
+
+/* ===== Capolettera ===== */
+p.lead::first-letter{
+  font-family:'Fraunces', serif;
+  font-weight:800;
+  font-size:58px;
+  float:left;
+  line-height:0.8;
+  padding:6px 10px 0 0;
+  color:var(--red);
+}
+
+/* ===== Articoli correlati (fondo pagina articolo) ===== */
+.correlati-title{
+  font-family:'Space Mono', monospace;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--slate);
+  margin:20px 0 18px;
+  border-top:1px solid var(--rule);
+  padding-top:30px;
+}
+.correlati-grid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:18px;
+}
+.correlato-card{
+  border:1px solid var(--rule);
+  text-decoration:none;
+  color:inherit;
+  display:block;
+  transition:transform .15s ease;
+}
+.correlato-card:hover{transform:translateY(-3px);}
+.correlato-img{
+  aspect-ratio:4/5;
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(155deg, var(--ink) 0%, var(--slate) 100%);
+}
+.correlato-img img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+.correlato-img::before{content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--red); z-index:2;}
+.correlato-body{padding:12px 14px;}
+.correlato-tag{font-family:'Space Mono', monospace; font-size:10px; color:var(--red); text-transform:uppercase; letter-spacing:.08em;}
+.correlato-body h5{font-family:'Fraunces', serif; font-size:14.5px; font-weight:600; margin-top:6px; line-height:1.3;}
+
+@media (max-width:560px){
+  .correlati-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:400px){
+  .correlati-grid{grid-template-columns:1fr;}
 }
 
 article.subpage-wrap{padding-bottom:90px;}

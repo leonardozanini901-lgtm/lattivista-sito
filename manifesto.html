@@ -42,6 +42,33 @@ article p{margin-bottom:18px; color:var(--ink-soft);}
 
 .firma{font-family:'Fraunces', serif; font-style:italic; font-weight:600; color:var(--ink-soft); margin-top:36px;}
 
+p.lead::first-letter{
+  font-family:'Fraunces', serif;
+  font-weight:800;
+  font-size:58px;
+  float:left;
+  line-height:0.8;
+  padding:6px 10px 0 0;
+  color:var(--red);
+}
+
+.paragrafo-numerato{
+  display:flex;
+  gap:20px;
+  align-items:flex-start;
+  margin-bottom:18px;
+}
+.numero-romano{
+  font-family:'Fraunces', serif;
+  font-style:italic;
+  font-weight:700;
+  color:var(--red);
+  font-size:20px;
+  flex-shrink:0;
+  width:28px;
+}
+.paragrafo-numerato p{margin-bottom:0;}
+
 .articoli-link{padding-bottom:70px;}
 .articoli-link a{
   display:inline-block;
@@ -86,15 +113,21 @@ footer p{font-family:'Space Mono',monospace; font-size:11.5px; opacity:0.75;}
 
 <article class="wrap">
 
-  <p>In un mondo dove la velocità d'informazione ha superato la velocità di pensiero, dove l'attesa e la riflessione non sono più atteggiamenti da perseguire ma da rifuggire, riprendersi uno spazio di dibattito e pensiero profondo è più che mai un gesto politico.</p>
+  <p class="lead">In un mondo dove la velocità d'informazione ha superato la velocità di pensiero, dove l'attesa e la riflessione non sono più atteggiamenti da perseguire ma da rifuggire, riprendersi uno spazio di dibattito e pensiero profondo è più che mai un gesto politico.</p>
 
   <p>Se anche la non scelta è una scelta, i pochi che invece scelgono di restare occupano anche la posizione lasciata da altri, è così che la politica si trasforma nel ring e nello squallore che è oggi.</p>
 
-  <p>Il risultato: la mediocrità vince per inerzia, sovrasta e annega tutto per mancanza di argini, vince perché viene riproposta come massimizzatrice degli standard considerati vincenti oggi: i like, le visual, la viralità, la popolarità al di là della profondità e del senso.</p>
+  <div class="paragrafo-numerato">
+    <span class="numero-romano">I.</span>
+    <p>Il risultato: la mediocrità vince per inerzia, sovrasta e annega tutto per mancanza di argini, vince perché viene riproposta come massimizzatrice degli standard considerati vincenti oggi: i like, le visual, la viralità, la popolarità al di là della profondità e del senso.</p>
+  </div>
 
   <p>In tutto questo, chi dal languore della demagogia non si fa sedurre rimane escluso. Decretando un prosciugamento della rappresentatività, della partecipazione e del progresso della società.</p>
 
-  <p>Fino a che, non arriva un momento in cui il vaso si colma. In cui la pazienza tracima e si trasforma in necessità di cambiamento. Quel momento siamo noi, giovani e stanchi di un mondo che ci esclude, che non ci considera e prende seriamente. Di una politica che si traveste da innovatrice ma poi si rivela paternalista, perché non comprende altro modo di ascendere se non perpetrando gli schemi e le tattiche subdole e inoperose utilizzate finora.</p>
+  <div class="paragrafo-numerato">
+    <span class="numero-romano">II.</span>
+    <p>Fino a che, non arriva un momento in cui il vaso si colma. In cui la pazienza tracima e si trasforma in necessità di cambiamento. Quel momento siamo noi, giovani e stanchi di un mondo che ci esclude, che non ci considera e prende seriamente. Di una politica che si traveste da innovatrice ma poi si rivela paternalista, perché non comprende altro modo di ascendere se non perpetrando gli schemi e le tattiche subdole e inoperose utilizzate finora.</p>
+  </div>
 
   <p>Partiamo quindi da un'urgenza e da un bisogno: l'urgenza di fermarsi, riflettere e andare oltre la superficie. Il bisogno di tornare a pensare insieme, senza paura del conflitto, senza timore della complessità.</p>
 
@@ -102,7 +135,10 @@ footer p{font-family:'Space Mono',monospace; font-size:11.5px; opacity:0.75;}
 
   <p>Questo è quindi uno spazio per dare forma a ciò che finora è stato trascurato, e che ha voglia di emergere; con pazienza, lentezza e profondità. Senza asservirsi alle logiche che ci hanno condotto fino a qui.</p>
 
-  <p>Perché vivere meglio si può, perché vivere meglio insieme non è un dovere ma un diritto, e come tale va esercitato. Per questo crediamo che informarsi non sia un atto passivo, ma un gesto di responsabilità. Che il pensiero critico non sia per pochi, ma una necessità per tutti. E che la parola, se usata con coscienza, possa ancora essere uno strumento di cambiamento, di solidarietà.</p>
+  <div class="paragrafo-numerato">
+    <span class="numero-romano">III.</span>
+    <p>Perché vivere meglio si può, perché vivere meglio insieme non è un dovere ma un diritto, e come tale va esercitato. Per questo crediamo che informarsi non sia un atto passivo, ma un gesto di responsabilità. Che il pensiero critico non sia per pochi, ma una necessità per tutti. E che la parola, se usata con coscienza, possa ancora essere uno strumento di cambiamento, di solidarietà.</p>
+  </div>
 
   <p>Abbiamo deciso di porre le nostre domande e di fornire delle opinioni. Di scriverle, di condividerle.</p>
 

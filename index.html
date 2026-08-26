@@ -81,10 +81,17 @@
       </div>
       <a href="archivio.html" class="btn btn-outline">Archivio articoli</a>
     </div>
-    <div class="numeri-grid" id="numeri-grid">
-      <!-- Le card degli articoli vengono generate automaticamente da app.js,
-           leggendo il contenuto da content/articles.json. Non modificare
-           questa parte a mano: per aggiungere un articolo, modifica il JSON. -->
+    <div class="numeri-carousel-top">
+      <span class="numeri-tag-indicator" id="numeri-tag-indicator" style="display:none;"></span>
+    </div>
+    <div class="numeri-carousel-wrap">
+      <div class="numeri-grid" id="numeri-grid">
+        <!-- Le card degli articoli vengono generate automaticamente da app.js,
+             leggendo il contenuto da content/articles.json. Non modificare
+             questa parte a mano: per aggiungere un articolo, modifica il JSON. -->
+      </div>
+      <button class="carousel-arrow carousel-arrow-left" id="numeri-prev" aria-label="Numero precedente" style="display:none;">‹</button>
+      <button class="carousel-arrow carousel-arrow-right" id="numeri-next" aria-label="Numero successivo" style="display:none;">›</button>
     </div>
   </div>
 </section>

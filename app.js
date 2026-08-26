@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initBackToTop();
   initNumeriCarousel();
   initArticoloPage();
+  initReadProgress();
 });
 
 /* ---------- Caricamento indice condiviso degli articoli ---------- */
@@ -96,7 +97,70 @@ async function initNumeriCarousel() {
       grid.appendChild(buildEmptyCard());
     }
   }
+
+  initNumeriCarouselControls(grid, articles);
 }
+
+/* ---------- Frecce + indicatore di categoria del carosello ---------- */
+
+function initNumeriCarouselControls(grid, articles) {
+  const prevBtn = document.getElementById("numeri-prev");
+  const nextBtn = document.getElementById("numeri-next");
+  const indicator = document.getElementById("numeri-tag-indicator");
+
+  const isCarousel = grid.classList.contains("is-carousel");
+
+  if (!isCarousel) {
+    if (prevBtn) prevBtn.style.display = "none";
+    if (nextBtn) nextBtn.style.display = "none";
+    if (indicator) indicator.style.display = "none";
+    return;
+  }
+
+  if (prevBtn) prevBtn.style.display = "flex";
+  if (nextBtn) nextBtn.style.display = "flex";
+  if (indicator) indicator.style.display = "";
+
+  const scrollByCard = (direction) => {
+    const card = grid.querySelector(".numero-card");
+    const gap = 34; // deve combaciare con il "gap" di .numeri-grid in CSS
+    const cardWidth = card ? card.getBoundingClientRect().width + gap : 300;
+    grid.scrollBy({ left: direction * cardWidth, behavior: "smooth" });
+  };
+
+  if (prevBtn) prevBtn.onclick = () => scrollByCard(-1);
+  if (nextBtn) nextBtn.onclick = () => scrollByCard(1);
+
+  const updateIndicator = () => {
+    if (!indicator) return;
+    const cards = Array.from(grid.querySelectorAll(".numero-card"));
+    if (cards.length === 0) return;
+
+    const gridRect = grid.getBoundingClientRect();
+    const gridCenter = gridRect.left + gridRect.width / 2;
+
+    let closestIndex = 0;
+    let closestDist = Infinity;
+    cards.forEach((card, i) => {
+      const r = card.getBoundingClientRect();
+      const dist = Math.abs((r.left + r.width / 2) - gridCenter);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestIndex = i;
+      }
+    });
+
+    const article = articles[closestIndex];
+    indicator.textContent = article ? (article.tag || "") : "";
+  };
+
+  let scrollTimer = null;
+  grid.addEventListener("scroll", () => {
+    window.clearTimeout(scrollTimer);
+    scrollTimer = window.setTimeout(updateIndicator, 80);
+  }, { passive: true });
+
+  updateIndicator();
 
 function buildNumeroCard(article) {
   const link = document.createElement("a");
@@ -193,7 +257,8 @@ async function initArticoloPage() {
   if (dekEl) dekEl.textContent = meta.excerpt || "";
   if (dataEl) dataEl.textContent = formatDataItaliana(meta.date);
 
-  initArticoloHeroBackground(id);
+  initArticoloCopertina(meta);
+  initArticoloCorrelati(indexArticles, meta);
 
   // 2. Carica in modo asincrono solo il file specifico con il corpo dell'articolo (content/<id>.json)
   try {
@@ -220,42 +285,87 @@ async function initArticoloPage() {
   }
 }
 
-/* ---------- Sfondo-copertina dietro al titolo (articolo.html) ---------- */
+/* ---------- Copertina nitida dell'articolo ---------- */
 
-const ARTICOLO_HERO_BASE_OPACITY = 0.55;
-const ARTICOLO_HERO_COLLAPSE_DISTANCE = 280; // px di scroll dopo cui l'immagine è sparita
+function initArticoloCopertina(article) {
+  const wrap = document.getElementById("articolo-copertina");
+  const imgEl = document.getElementById("articolo-copertina-img");
+  if (!wrap || !imgEl) return;
 
-function initArticoloHeroBackground(id) {
-  const heroBgEl = document.getElementById("articolo-hero-bg");
-  if (!heroBgEl) return;
+  const imgPath = `assets/articles previews/${encodeURIComponent(article.id)}.webp`;
 
-  const imgPath = `assets/articles previews/${encodeURIComponent(id)}.webp`;
-
-  // Precarica l'immagine: se non esiste, lo sfondo resta semplicemente
-  // invisibile (nessun segnaposto rotto dietro al titolo).
+  // Precarica l'immagine: se non esiste, la sezione copertina
+  // resta semplicemente nascosta.
   const preload = new Image();
   preload.onload = () => {
-    heroBgEl.style.backgroundImage = `url("${imgPath}")`;
-    // Un frame di ritardo per far scattare la transizione di opacità già definita in CSS
-    requestAnimationFrame(() => {
-      heroBgEl.style.opacity = String(ARTICOLO_HERO_BASE_OPACITY);
-    });
-    initArticoloHeroScroll(heroBgEl);
+    imgEl.src = imgPath;
+    imgEl.alt = article.title || "";
   };
   preload.onerror = () => {
-    heroBgEl.style.display = "none";
+    wrap.style.display = "none";
   };
   preload.src = imgPath;
+
+  const captionEl = document.getElementById("articolo-copertina-caption");
+  if (captionEl) {
+    captionEl.textContent = article.cover_caption || "";
+    captionEl.style.display = article.cover_caption ? "" : "none";
+  }
 }
 
-function initArticoloHeroScroll(heroBgEl) {
-  const onScroll = () => {
-    const progress = Math.min(window.scrollY / ARTICOLO_HERO_COLLAPSE_DISTANCE, 1);
-    heroBgEl.style.opacity = String(ARTICOLO_HERO_BASE_OPACITY * (1 - progress));
-    heroBgEl.style.transform = `scale(${1.18 + progress * 0.1}) translateY(${progress * -24}px)`;
+/* ---------- Articoli correlati (stesso tag, fondo pagina) ---------- */
+
+function initArticoloCorrelati(indexArticles, current) {
+  const section = document.getElementById("articolo-correlati");
+  const grid = document.getElementById("articolo-correlati-grid");
+  if (!section || !grid) return;
+
+  const correlati = indexArticles
+    .filter(a => a.id !== current.id && a.tag === current.tag)
+    .slice(0, 3);
+
+  if (correlati.length === 0) return; // resta nascosta
+
+  grid.innerHTML = "";
+  correlati.forEach(article => grid.appendChild(buildCorrelatoCard(article)));
+  section.style.display = "";
+}
+
+function buildCorrelatoCard(article) {
+  const link = document.createElement("a");
+  link.className = "correlato-card";
+  link.href = `articolo.html?id=${encodeURIComponent(article.id)}`;
+
+  const imgPath = `assets/articles previews/${encodeURIComponent(article.id)}.webp`;
+
+  link.innerHTML = `
+    <div class="correlato-img">
+      <img src="${imgPath}" alt="${escapeHtml(article.title)}" loading="lazy" onerror="this.style.display='none';">
+    </div>
+    <div class="correlato-body">
+      <span class="correlato-tag">${escapeHtml(article.tag || '')}</span>
+      <h5>${escapeHtml(article.title)}</h5>
+    </div>
+  `;
+  return link;
+}
+
+/* ---------- Barra di avanzamento lettura (articolo.html) ---------- */
+
+function initReadProgress() {
+  const bar = document.getElementById("read-progress");
+  if (!bar) return;
+
+  const update = () => {
+    const h = document.documentElement;
+    const scrollable = h.scrollHeight - h.clientHeight;
+    const pct = scrollable > 0 ? (h.scrollTop / scrollable) * 100 : 0;
+    bar.style.width = pct + "%";
   };
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
+
+  document.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  update();
 }
 
 /* ---------- Pulsante "torna in cima" (index.html) ---------- */
