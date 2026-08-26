@@ -161,6 +161,7 @@ function initNumeriCarouselControls(grid, articles) {
   }, { passive: true });
 
   updateIndicator();
+}
 
 function buildNumeroCard(article) {
   const link = document.createElement("a");
