@@ -736,6 +736,7 @@ p.lead::first-letter{
   display:grid;
   grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
   gap:18px;
+  margin-bottom:60px;
 }
 .correlato-card{
   border:1px solid var(--rule);
@@ -770,6 +771,7 @@ article.subpage-wrap{padding-bottom:90px;}
 .articolo-wide .title-block{padding:64px 0 0;}
 .articolo-wide .title-block h1{max-width:740px; margin-left:auto; margin-right:auto;}
 .articolo-wide .title-block .dek{max-width:560px;}
+.articolo-wide .rule-double{margin-top:28px;}
 
 .articolo-grid{
   display:grid;
