@@ -279,6 +279,13 @@ async function initArticoloPage() {
       } else if (articleData.content) {
         bodyEl.innerHTML = articleData.content;
       }
+
+      if (articleData.author) {
+        const firma = document.createElement("p");
+        firma.className = "firma";
+        firma.textContent = `— ${articleData.author}`;
+        bodyEl.appendChild(firma);
+      }
     }
   } catch (err) {
     console.error(err);
@@ -322,8 +329,8 @@ function initArticoloCorrelati(indexArticles, current) {
   if (!section || !grid) return;
 
   const correlati = indexArticles
-    .filter(a => a.id !== current.id && a.tag === current.tag)
-    .slice(0, 3);
+    .filter(a => a.id !== current.id)
+    .slice(0, 5);
 
   if (correlati.length === 0) return; // resta nascosta
 

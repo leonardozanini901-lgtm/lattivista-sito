@@ -643,14 +643,21 @@ header.masthead-sub{padding:18px 0; border-bottom:1px solid var(--rule);}
 .articolo-data{font-family:'Space Mono', monospace; font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); margin-top:16px;}
 
 /* ===== Copertina nitida dell'articolo =====
-   Immagine di copertina a piena larghezza, mostrata subito sotto
-   al blocco titolo. Impostata via JS (app.js) con l'immagine
-   assets/articles previews/<id>.webp; se manca, la sezione va
-   nascosta con display:none dallo script. */
-.copertina{margin:34px 0 6px;}
+   Foto "montata" su una cornice color carta con taglio rosso
+   laterale, invece della barra piatta sopra l'immagine: regge
+   meglio con foto di contenuto e colori vari. Impostata via JS
+   (app.js) con l'immagine assets/articles previews/<id>.webp;
+   se manca, la sezione va nascosta dallo script. */
+.copertina{margin:0 0 34px;}
+.copertina-frame{
+  background:var(--paper-2);
+  border:1px solid var(--rule);
+  border-left:4px solid var(--red);
+  padding:16px 20px 24px;
+}
 .copertina-img{
   width:100%;
-  aspect-ratio:16/8;
+  aspect-ratio:16/10;
   position:relative;
   overflow:hidden;
   background:linear-gradient(155deg, var(--ink) 0%, var(--slate) 100%);
@@ -661,19 +668,12 @@ header.masthead-sub{padding:18px 0; border-bottom:1px solid var(--rule);}
   object-fit:cover;
   display:block;
 }
-.copertina-img::before{
-  content:"";
-  position:absolute; top:0; left:0; right:0; height:4px;
-  background:var(--red);
-  z-index:2;
-}
 .copertina-caption{
   font-family:'Space Mono', monospace;
   font-size:11px;
-  letter-spacing:.03em;
+  letter-spacing:.04em;
   color:var(--slate);
-  text-align:right;
-  margin-top:8px;
+  margin-top:14px;
 }
 
 /* ===== Barra di avanzamento lettura =====
@@ -728,13 +728,13 @@ p.lead::first-letter{
   text-transform:uppercase;
   letter-spacing:.1em;
   color:var(--slate);
-  margin:20px 0 18px;
+  margin:50px 0 18px;
   border-top:1px solid var(--rule);
   padding-top:30px;
 }
 .correlati-grid{
   display:grid;
-  grid-template-columns:repeat(3, minmax(0,1fr));
+  grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
   gap:18px;
 }
 .correlato-card{
@@ -757,14 +757,74 @@ p.lead::first-letter{
 .correlato-tag{font-family:'Space Mono', monospace; font-size:10px; color:var(--red); text-transform:uppercase; letter-spacing:.08em;}
 .correlato-body h5{font-family:'Fraunces', serif; font-size:14.5px; font-weight:600; margin-top:6px; line-height:1.3;}
 
-@media (max-width:560px){
-  .correlati-grid{grid-template-columns:1fr 1fr;}
-}
-@media (max-width:400px){
-  .correlati-grid{grid-template-columns:1fr;}
-}
 
 article.subpage-wrap{padding-bottom:90px;}
+
+/* ============================================================
+   LAYOUT A DUE COLONNE DELLA PAGINA ARTICOLO
+   Colonna larga per il testo, colonna stretta a destra con
+   rimandi al Manifesto e ai social — così la pagina non resta
+   vuota accanto a un testo corto.
+   ============================================================ */
+.articolo-wide{max-width:1000px; margin:0 auto; padding:0 28px;}
+.articolo-wide .title-block{padding:64px 0 0;}
+.articolo-wide .title-block h1{max-width:740px; margin-left:auto; margin-right:auto;}
+.articolo-wide .title-block .dek{max-width:560px;}
+
+.articolo-grid{
+  display:grid;
+  grid-template-columns:1fr 260px;
+  gap:56px;
+  align-items:start;
+  margin-top:6px;
+}
+#articolo-body{padding-bottom:0;}
+#articolo-body p{margin-bottom:18px; color:var(--ink-soft); font-size:17px; line-height:1.7;}
+
+.articolo-sidebar{
+  border-left:1px solid var(--rule);
+  padding-left:32px;
+  position:sticky;
+  top:24px;
+}
+.sidebar-block{margin-bottom:36px;}
+.sidebar-block:last-child{margin-bottom:0;}
+.sidebar-block .kicker{display:block; margin-bottom:14px;}
+.sidebar-block a{
+  display:block;
+  font-family:'Space Mono', monospace;
+  font-size:12.5px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--ink);
+  text-decoration:none;
+  padding-bottom:9px;
+  margin-bottom:9px;
+  border-bottom:1px solid var(--rule);
+}
+.sidebar-block a:last-child{margin-bottom:0; border-bottom:none; padding-bottom:0;}
+.sidebar-block a:hover{color:var(--red);}
+
+/* ===== Firma dell'autore in fondo all'articolo ===== */
+.firma{
+  font-family:'Fraunces', serif;
+  font-style:italic;
+  font-weight:600;
+  color:var(--ink-soft);
+  margin-top:36px;
+}
+
+@media (max-width:880px){
+  .articolo-grid{grid-template-columns:1fr;}
+  .articolo-sidebar{
+    border-left:none;
+    border-top:1px solid var(--rule);
+    padding-left:0;
+    padding-top:26px;
+    margin-top:10px;
+    position:static;
+  }
+}
 article.subpage-wrap p{margin-bottom:18px; color:var(--ink-soft); font-size:17px; line-height:1.7;}
 
 .subpage-footer{background:var(--ink); color:var(--paper-2); padding:40px 0; text-align:center;}

@@ -374,6 +374,17 @@
                     💡 Gli invii a capo doppi generano righe vuote nell'array "body" per preservare la spaziatura nell'articolo finale.
                 </div>
             </fieldset>
+
+            <fieldset class="control-group">
+                <legend>03 // AUTORE</legend>
+                <div class="control-item">
+                    <label>Nome dell'autore (facoltativo)</label>
+                    <input type="text" id="art-author" placeholder="Es. Mario Rossi">
+                </div>
+                <div class="info-note">
+                    💡 Se compilato, viene mostrato in fondo all'articolo come firma in corsivo.
+                </div>
+            </fieldset>
         </div>
 
         <!-- COLONNA 3: PREVIEW IMMAGINE & COMMIT -->
@@ -696,8 +707,10 @@
                     if (contentJson && contentJson.body) {
                         document.getElementById('art-content').value = contentJson.body.join('\n');
                     }
+                    document.getElementById('art-author').value = (contentJson && contentJson.author) || '';
                 } else {
                     document.getElementById('art-content').value = '';
+                    document.getElementById('art-author').value = '';
                 }
                 log(`Articolo "${art.id}" pronto per la modifica.`, "success");
             } catch (err) {
@@ -716,6 +729,7 @@
             const excerpt = document.getElementById('art-excerpt').value.trim();
             const coverLinesText = document.getElementById('art-cover-lines').value.trim();
             const rawContent = document.getElementById('art-content').value;
+            const author = document.getElementById('art-author').value.trim();
 
             if (!id || !title) {
                 log("ERRORE: Compila almeno i campi ID e Titolo!", "error");
@@ -743,7 +757,7 @@
                 }
 
                 // 2. Creazione e Upload del JSON dell'articolo in content/{id}.json
-                if (rawContent) {
+                if (rawContent || author) {
                     log("Formattazione paragrafi...", "info");
                     
                     let paragraphs = rawContent.split(/\r?\n/).map(p => p.trim());
@@ -755,6 +769,9 @@
                         id: id,
                         body: paragraphs
                     };
+                    if (author) {
+                        articleJsonObj.author = author;
+                    }
 
                     const contentPath = `content/${id}.json`;
                     log(`Upload file articolo in ${contentPath}...`, "info");
