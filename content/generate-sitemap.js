@@ -16,7 +16,7 @@ const path = require('path');
 
 // ==================== CONFIGURAZIONE ====================
 // Sostituisci con il dominio reale del sito (senza slash finale)
-const SITE_URL = 'https://www.lattivista.it';
+const SITE_URL = 'https://lattivista.it';
 
 // Percorso del file articles.json rispetto a questo script
 const ARTICLES_JSON_PATH = path.join(__dirname, 'articles.json');

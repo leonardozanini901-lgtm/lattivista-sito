@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.lattivista.it/sitemap.xml
+Sitemap: https://lattivista.it/sitemap.xml
