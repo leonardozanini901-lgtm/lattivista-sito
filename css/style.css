@@ -711,6 +711,7 @@ header.masthead-sub{padding:18px 0; border-bottom:1px solid var(--rule);}
 .paragrafo-numerato p{margin-bottom:0;}
 
 /* ===== Capolettera ===== */
+/* Capolettera: la prima lettera resta visibile anche sul fondo rosso */
 p.lead::first-letter{
   font-family:'Fraunces', serif;
   font-weight:800;
@@ -718,7 +719,10 @@ p.lead::first-letter{
   float:left;
   line-height:0.8;
   padding:6px 10px 0 0;
-  color:var(--red);
+  color:var(--paper);
+  margin-left:0;
+  position:static;
+  transform:none;
 }
 
 /* ===== Articoli correlati (fondo pagina articolo) ===== */
