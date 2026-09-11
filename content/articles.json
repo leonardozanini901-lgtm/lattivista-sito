@@ -1,16 +1,5 @@
 [
   {
-    "id": "test-3",
-    "title": "test terzo articolo",
-    "tag": "test 3",
-    "excerpt": "dadadawd",
-    "cover_lines": [
-      "dadaw",
-      "ada"
-    ],
-    "date": "2026-08-22"
-  },
-  {
     "id": "test-1",
     "title": "test titolo 1",
     "tag": "test 1",
