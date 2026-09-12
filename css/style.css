@@ -324,9 +324,11 @@ nav.mainnav a:hover{color:var(--red);}
   letter-spacing: 0.05em;
 }
 
-/* Animazione al passaggio del mouse */
+/* Animazione al passaggio del mouse: leggero sollevamento + rotazione minima,
+   più vicina a una carta fisica che si stacca dal tavolo */
 .numero-card:not(.is-empty):hover {
-  transform: translateY(-4px);
+  transform: translateY(-7px) rotate(-0.35deg);
+  box-shadow: 0 18px 34px rgba(24,21,17,0.16);
 }
 
 .numero-img {
@@ -586,8 +588,7 @@ footer{
   .numeri-tag-indicator{display:none !important;}
 }
 
-/* .numero-card{text-decoration:none; color:inherit; display:block; transition:transform .15s ease, box-shadow .15s ease;} */
-.numero-card:not(.is-empty):hover{transform:translateY(-3px);}
+/* (regola duplicata rimossa: l'hover della card è ora definito in un unico punto, sopra) */
 
 .numeri-error{font-size:14.5px; color:var(--slate); font-style:italic;}
 
@@ -690,6 +691,83 @@ header.masthead-sub{padding:18px 0; border-bottom:1px solid var(--rule);}
 }
 @media (prefers-reduced-motion: reduce){
   #read-progress{transition:none;}
+}
+
+/* ===== Capolettera per testi lunghi SU FONDO CHIARO (manifesto, articoli) =====
+   Distinto da p.lead::first-letter (pensato per fondo rosso/scuro, es. .movimento):
+   qui la prima lettera resta rossa su carta, altrimenti sparirebbe. ===== */
+.capolettera::first-letter{
+  font-family:'Fraunces', serif;
+  font-weight:800;
+  font-size:58px;
+  float:left;
+  line-height:0.8;
+  padding:6px 10px 0 0;
+  color:var(--red);
+}
+
+/* ===== Pull-quote condiviso: manifesto + articoli lunghi =====
+   Prima era duplicato solo dentro manifesto.html; ora è riusabile
+   ovunque via css/style.css, con un grande apice per dargli peso
+   visivo senza aggiungere un'immagine. ===== */
+.pull{
+  position:relative;
+  font-family:'Fraunces', serif;
+  font-style:italic;
+  font-weight:600;
+  font-size:24px;
+  line-height:1.42;
+  color:var(--ink);
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  padding:34px 0 34px 44px;
+  margin:44px 0;
+}
+.pull::before{
+  content:"\201C";
+  position:absolute;
+  left:-6px; top:14px;
+  font-family:'Fraunces', serif;
+  font-weight:800;
+  font-style:normal;
+  font-size:74px;
+  line-height:1;
+  color:var(--red);
+  opacity:0.85;
+}
+@media (max-width:560px){
+  .pull{font-size:20px; padding-left:34px;}
+  .pull::before{font-size:56px;}
+}
+
+/* ===== Link "vai agli articoli" sotto un testo lungo (manifesto) ===== */
+.articoli-link{padding-bottom:70px;}
+.articoli-link a{
+  display:inline-block;
+  font-family:'Space Mono', monospace;
+  font-size:12.5px;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  font-weight:700;
+  color:var(--ink);
+  text-decoration:none;
+  border-bottom:1.5px solid var(--red);
+  padding-bottom:3px;
+}
+.articoli-link a:hover{color:var(--red);}
+
+/* ===== Reveal-on-scroll: micro-animazione discreta gestita da
+   app-enhance.js, indipendente da app.js. Se lo script non parte
+   per qualsiasi motivo, il fallback (vedi <noscript> in ogni pagina)
+   forza opacity:1, quindi il contenuto resta sempre leggibile. ===== */
+.reveal{
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity .6s ease, transform .6s ease;
+}
+.reveal.is-visible{opacity:1; transform:translateY(0);}
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1; transform:none; transition:none;}
 }
 
 /* ===== Paragrafi numerati (manifesto e articoli lunghi) ===== */

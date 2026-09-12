@@ -26,6 +26,7 @@
 
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" type="image/png" href="assets/favicon.png">
+<noscript><style>.reveal{opacity:1!important; transform:none!important;}</style></noscript>
 </head>
 <body>
 
@@ -68,16 +69,18 @@
     <div class="hero-side">
       <div class="kicker">— Editoriale di apertura</div>
       <h1>La politica si è impoverita di parole e idee.<br><em>Noi ne stiamo portando di nuove.</em></h1>
-      
-      <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 28px;">
+      <p>Non slogan, non tifoserie: analisi che provano a spiegare invece di semplificare. È da qui che ripartiamo a ogni numero.</p>
+
+      <div style="display: flex; gap: 22px; flex-wrap: wrap; align-items: center; margin-top: 28px;">
         <a href="#movimento" class="btn btn-red">Entra nel movimento</a>
         <a href="archivio.html" class="btn btn-outline">Archivio articoli</a>
+        <div class="stamp" aria-hidden="true"><div class="stamp-text">Redazione<br>indipendente<br>— 2026 —</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="manifesto" id="manifesto">
+<section class="manifesto reveal" id="manifesto">
   <div class="wrap">
     <div class="kicker">— Il Manifesto</div>
     <div class="manifesto-text">
@@ -91,7 +94,7 @@
 
 <section class="numeri" id="numeri">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div>
         <div class="kicker">— Archivio</div>
         <div class="section-title">Gli ultimi numeri</div>
@@ -114,7 +117,7 @@
 </section>
 
 <section class="movimento" id="movimento">
-  <div class="wrap movimento-grid">
+  <div class="wrap movimento-grid reveal">
     <div>
       <div class="kicker">— Diventa parte attiva</div>
       <h2>Non sei un lettore.<br>Sei una firma sotto il manifesto.</h2>
@@ -166,6 +169,7 @@
 <button id="back-to-top" aria-label="Torna in cima alla pagina" title="Torna in cima">↑</button>
 
 <script src="app.js" defer></script>
+<script src="app-enhance.js" defer></script>
 <script src="cache-buster.js"></script>
 </body>
 </html>
