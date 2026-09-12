@@ -37,10 +37,13 @@
 <div class="articolo-wide">
 
   <div class="title-block" id="articolo-container">
-    <div class="kicker" id="articolo-kicker">—</div>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <span class="kicker" id="articolo-kicker">—</span>
+      <span class="articolo-data" id="articolo-data" style="margin-top:0;"></span>
+    </div>
     <h1 id="articolo-titolo">Caricamento…</h1>
     <p class="dek" id="articolo-dek"></p>
-    <p class="articolo-data" id="articolo-data"></p>
+    <p class="firma" id="articolo-autore" style="margin-top:16px; font-style:italic; font-family:'Fraunces', serif; font-size:18px; font-weight:600;"></p>
   </div>
 
   <div class="rule-double"></div>
@@ -79,9 +82,34 @@
 
 </div>
 
-<footer class="subpage-footer">
-  <div class="subpage-wrap">
-    <p>© 2026 L'Attivista — <a href="index.html">Torna alla homepage</a></p>
+<footer id="contatti">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-title">L'Attivista</div>
+        <p>Foglio indipendente di opinione e cultura politica. Nato online, scritto da chi crede che capire sia il primo atto politico.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Il foglio</h5>
+        <a href="index.html#manifesto">Il Manifesto</a>
+        <a href="index.html#numeri">Ultimi Numeri</a>
+        <a href="index.html#movimento">Come partecipare</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contatti</h5>
+        <p style="font-size: 13.5px; margin-bottom: 8px;">Hai una domanda, vuoi proporre una collaborazione o segnalarci qualcosa?</p>
+        <a href="mailto:info@lattivista.it" style="font-weight: 600;">info@lattivista.it</a>
+      </div>
+      <div class="footer-col">
+        <h5>Seguici</h5>
+        <a href="https://www.instagram.com/_lattivista/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://whatsapp.com/channel/0029VbCqBNJ7IUYTyqx9mj2U" target="_blank" rel="noopener">Canale WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 L'Attivista — Tutti i diritti riservati</span>
+      <span>Indipendenti per scelta editoriale</span>
+    </div>
   </div>
 </footer>
 
