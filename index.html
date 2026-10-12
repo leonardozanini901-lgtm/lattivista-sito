@@ -135,6 +135,24 @@
   </div>
 </section>
 
+<section class="tuavoce reveal" id="scrivici">
+  <div class="wrap tuavoce-grid">
+    <div>
+      <div class="kicker">— La tua voce</div>
+      <h2>Hai qualcosa da dire?<br><em>Qui c'è spazio per farlo.</em></h2>
+      <p class="tuavoce-lead">Un pensiero, un'esperienza, un'opinione: chiunque abbia qualcosa da dire può scriverci. Se rispetta le regole del dialogo, il tuo testo sarà ripubblicato sulla nostra pagina Instagram, con la risposta della redazione, e aprirà il confronto con tutta la community.</p>
+      <div class="tuavoce-mail">Scrivi a<br><a href="mailto:info@lattivista.it">info@lattivista.it</a></div>
+      <div class="tuavoce-actions">
+        <button type="button" class="btn btn-red" id="open-invia" aria-haspopup="dialog" aria-controls="modal-invia">Come inviare il tuo testo</button>
+      </div>
+    </div>
+    <div class="tuavoce-quote">
+      <p>Una politica che si spiega, non si urla.</p>
+      <span>— dal Manifesto</span>
+    </div>
+  </div>
+</section>
+
 <footer id="contatti">
   <div class="wrap">
     <div class="footer-grid">
@@ -166,8 +184,96 @@
   </div>
 </footer>
 
+<div class="modal-overlay" id="modal-invia" role="dialog" aria-modal="true" aria-labelledby="modal-invia-title" aria-hidden="true">
+  <div class="modal">
+    <button type="button" class="modal-close" id="close-invia" aria-label="Chiudi">×</button>
+    <div class="kicker">— La tua voce</div>
+    <h3 id="modal-invia-title">Scrivi su L'Attivista</h3>
+    <p class="modal-intro">Questa è un'opportunità per <strong>esprimere la tua idea senza il timore di essere attaccato</strong>. È il nostro tentativo di ristabilire un dialogo sull'attualità e sulla politica in un tempo in cui non si fa più: per ricostruire un senso comune di appartenenza e creare idee insieme, nel rispetto della pluralità. Perché, come scriviamo nel Manifesto, crediamo in una politica che argomenta invece di accusare e che include invece di dividere.</p>
+
+    <div class="modal-steps">
+      <div class="modal-step">
+        <div class="num">I</div>
+        <div>
+          <h4>Cosa puoi inviare</h4>
+          <p>Un pensiero, un'esperienza, una riflessione o qualsiasi altro testo simile: ciò che conta è che sia tuo e che abbia qualcosa da dire.</p>
+        </div>
+      </div>
+      <div class="modal-step">
+        <div class="num">II</div>
+        <div>
+          <h4>Come inviarlo</h4>
+          <p>Scrivi il tuo testo in un documento e invialo via mail a <a href="mailto:info@lattivista.it">info@lattivista.it</a>.</p>
+        </div>
+      </div>
+      <div class="modal-step">
+        <div class="num">III</div>
+        <div>
+          <h4>La presentazione personale</h4>
+          <p>Allega al documento una tua piccola presentazione personale: vogliamo sapere chi c'è dietro le parole.</p>
+        </div>
+      </div>
+      <div class="modal-step">
+        <div class="num">IV</div>
+        <div>
+          <h4>Le regole del dialogo</h4>
+          <p>Il testo deve essere scritto senza volgarità e sempre nel rispetto degli altri. Si può criticare e si possono portare opinioni diverse, anche opposte alle nostre: purché lo si faccia con argomenti, mai con l'offesa.</p>
+        </div>
+      </div>
+      <div class="modal-step">
+        <div class="num">V</div>
+        <div>
+          <h4>Cosa succede dopo</h4>
+          <p>Se rispetterà i requisiti, il tuo messaggio verrà pubblicato sulla pagina Instagram insieme alla risposta della redazione, e servirà ad aprire un dibattito nei commenti con tutta la community.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <a href="mailto:info@lattivista.it?subject=La%20mia%20voce%20su%20L%27Attivista" class="btn btn-red">Scrivi alla redazione</a>
+      <button type="button" class="btn btn-outline" id="dismiss-invia">Chiudi</button>
+    </div>
+  </div>
+</div>
+
 <button id="back-to-top" aria-label="Torna in cima alla pagina" title="Torna in cima">↑</button>
 
+<script>
+(function(){
+  var overlay=document.getElementById('modal-invia');
+  var openBtn=document.getElementById('open-invia');
+  if(!overlay||!openBtn) return;
+  var closeBtns=[document.getElementById('close-invia'),document.getElementById('dismiss-invia')];
+  var lastFocus=null;
+  function open(){
+    lastFocus=document.activeElement;
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-open');
+    document.getElementById('close-invia').focus();
+  }
+  function close(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open');
+    if(lastFocus) lastFocus.focus();
+  }
+  openBtn.addEventListener('click',open);
+  closeBtns.forEach(function(b){ if(b) b.addEventListener('click',close); });
+  overlay.addEventListener('click',function(e){ if(e.target===overlay) close(); });
+  document.addEventListener('keydown',function(e){
+    if(!overlay.classList.contains('open')) return;
+    if(e.key==='Escape'){ close(); return; }
+    if(e.key==='Tab'){
+      var f=overlay.querySelectorAll('a[href],button');
+      if(!f.length) return;
+      var first=f[0], last=f[f.length-1];
+      if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+    }
+  });
+})();
+</script>
 <script src="app.js" defer></script>
 <script src="app-enhance.js" defer></script>
 <script src="cache-buster.js"></script>
