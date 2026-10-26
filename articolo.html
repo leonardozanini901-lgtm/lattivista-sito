@@ -21,6 +21,11 @@
 <meta name="twitter:image" id="meta-twitter-image" content="https://lattivista.it/assets/social-preview.png">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" type="image/png" href="assets/favicon.png">
+<style>
+.articolo-firma{margin:56px 0 0;padding-top:20px;border-top:1px solid currentColor;border-top-color:rgba(0,0,0,.18);font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:18px;}
+.articolo-firma[hidden]{display:none;}
+.articolo-wide{padding-bottom:96px;}
+</style>
 <noscript><style>.reveal{opacity:1!important; transform:none!important;}</style></noscript>
 </head>
 <body>
@@ -60,6 +65,7 @@
       </figure>
 
       <article id="articolo-body"></article>
+      <p class="articolo-firma" id="articolo-firma" hidden></p>
     </div>
 
     <aside class="articolo-sidebar">
@@ -113,6 +119,30 @@
   </div>
 </footer>
 
+<script>
+(function(){
+  var el=document.getElementById('articolo-firma');
+  if(!el) return;
+  function show(n){ n=(n||'').trim(); if(!n) return false; el.textContent='\u2014 '+n; el.hidden=false; return true; }
+  function getId(){
+    var q=new URLSearchParams(location.search), keys=['id','slug','articolo','a','art','n'], i, v;
+    for(i=0;i<keys.length;i++){ v=q.get(keys[i]); if(v) return v; }
+    var first=Array.from(q.values())[0]; if(first) return first;
+    if(location.hash.length>1) return location.hash.slice(1);
+    return '';
+  }
+  function fallback(){
+    var top=document.getElementById('articolo-autore');
+    if(top) show(top.textContent);
+  }
+  var id=getId();
+  if(!id){ window.addEventListener('load',function(){ setTimeout(fallback,1200); }); return; }
+  fetch('content/'+encodeURIComponent(id)+'.json',{cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(j){ if(!show(j&&j.author)) fallback(); })
+    .catch(function(){ window.addEventListener('load',function(){ setTimeout(fallback,1200); }); });
+})();
+</script>
 <script src="app.js" defer></script>
 <script src="app-enhance.js" defer></script>
 <script src="cache-buster.js"></script>
