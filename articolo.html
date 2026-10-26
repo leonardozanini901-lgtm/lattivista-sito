@@ -25,6 +25,7 @@
 .articolo-firma{margin:56px 0 0;padding-top:20px;border-top:1px solid currentColor;border-top-color:rgba(0,0,0,.18);font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:18px;}
 .articolo-firma[hidden]{display:none;}
 .articolo-wide{padding-bottom:96px;}
+#articolo-autore{display:none!important;}
 </style>
 <noscript><style>.reveal{opacity:1!important; transform:none!important;}</style></noscript>
 </head>
@@ -123,7 +124,14 @@
 (function(){
   var el=document.getElementById('articolo-firma');
   if(!el) return;
-  function show(n){ n=(n||'').trim(); if(!n) return false; el.textContent='\u2014 '+n; el.hidden=false; return true; }
+  function norm(t){ return (t||'').replace(/^[\s\u2014\u2013\-]+/,'').replace(/\s+/g,' ').trim().toLowerCase(); }
+  function dedupe(n){
+    var body=document.getElementById('articolo-body'); if(!body) return;
+    var key=norm(n);
+    function run(){ Array.prototype.forEach.call(body.children,function(c){ if(norm(c.textContent)===key) c.style.display='none'; }); }
+    run(); new MutationObserver(run).observe(body,{childList:true,subtree:true});
+  }
+  function show(n){ n=(n||'').trim(); if(!n) return false; el.textContent='\u2014 '+n; el.hidden=false; dedupe(n); return true; }
   function getId(){
     var q=new URLSearchParams(location.search), keys=['id','slug','articolo','a','art','n'], i, v;
     for(i=0;i<keys.length;i++){ v=q.get(keys[i]); if(v) return v; }
