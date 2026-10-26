@@ -1,13 +1,1 @@
-[
-  {
-    "id": "test",
-    "title": "titolo dell'articolo",
-    "tag": "tag",
-    "excerpt": "piccola descrizione",
-    "cover_lines": [
-      "riga 1",
-      "riga 2"
-    ],
-    "date": "2026-10-26"
-  }
-]
+[]
