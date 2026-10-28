@@ -1,16 +1,5 @@
 [
   {
-    "id": "test",
-    "title": "titolo",
-    "tag": "tag",
-    "excerpt": "descrizoione",
-    "cover_lines": [
-      "i",
-      "b"
-    ],
-    "date": "2026-10-28"
-  },
-  {
     "id": "28/10/26.Leti",
     "title": "\"Politica\"",
     "tag": "Filosofia",
