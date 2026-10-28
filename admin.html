@@ -385,13 +385,24 @@
                     💡 Se compilato, viene mostrato in fondo all'articolo come firma in corsivo.
                 </div>
             </fieldset>
+
+            <fieldset class="control-group">
+                <legend>04 // FONTI DELL'ARTICOLO</legend>
+                <div class="control-item">
+                    <label>Fonti (una per riga, facoltative)</label>
+                    <textarea id="art-sources" style="min-height: 160px;" placeholder="## Titolo di un gruppo (facoltativo)&#10;Cognome, N. (2006). *Titolo del libro*. Editore.&#10;Autore (2019). Titolo dell'articolo. Rivista, 41(1). | https://doi.org/..."></textarea>
+                </div>
+                <div class="info-note">
+                    💡 Una fonte per riga. Per aggiungere un link scrivi <b>testo | https://indirizzo</b> (barra verticale con uno spazio per lato). Una riga che inizia con <b>## </b> crea un titolo di gruppo. Con <b>*asterischi*</b> il testo va in corsivo. Se non scrivi nulla, il collegamento alle fonti non compare sotto l'articolo.
+                </div>
+            </fieldset>
         </div>
 
         <!-- COLONNA 3: PREVIEW IMMAGINE & COMMIT -->
         <div style="display: flex; flex-direction: column; gap: 20px;">
             
             <fieldset class="control-group">
-                <legend>03 // IMMAGINE PREVIEW (.WEBP)</legend>
+                <legend>05 // IMMAGINE PREVIEW (.WEBP)</legend>
                 <div class="img-preview-box" id="img-box">
                     <span style="font-size: 10px; color: rgba(255,255,255,0.4);">Nessuna immagine</span>
                     <img id="preview-img" class="hidden">
@@ -404,7 +415,7 @@
             </fieldset>
 
             <fieldset class="control-group">
-                <legend>04 // AZIONE COMMIT</legend>
+                <legend>06 // AZIONE COMMIT</legend>
                 <button id="publish-btn" class="action-btn highlight">PUBBLICA ARTICOLO</button>
             </fieldset>
 
@@ -520,6 +531,40 @@
             };
             reader.readAsDataURL(file);
         });
+
+        // Fonti: conversione tra testo del form e array "sources" salvato in content/{id}.json
+        // Riga normale  -> { text, url? }   (url dopo " | ")
+        // Riga "## xxx" -> { heading }
+        function parseSources(raw) {
+            const out = [];
+            (raw || '').split(/\r?\n/).forEach(line => {
+                line = line.trim();
+                if (!line) return;
+                if (line.startsWith('## ')) {
+                    const h = line.slice(3).trim();
+                    if (h) out.push({ heading: h });
+                    return;
+                }
+                const m = line.match(/^(.*?)\s+\|\s+(https?:\/\/\S+)\s*$/);
+                if (m && m[1].trim()) {
+                    out.push({ text: m[1].trim(), url: m[2] });
+                } else if (/^https?:\/\/\S+$/.test(line)) {
+                    out.push({ text: line, url: line });
+                } else {
+                    out.push({ text: line });
+                }
+            });
+            return out;
+        }
+
+        function sourcesToText(arr) {
+            if (!Array.isArray(arr)) return '';
+            return arr.map(x => {
+                if (!x) return '';
+                if (x.heading) return '## ' + x.heading;
+                return x.url && x.url !== x.text ? `${x.text} | ${x.url}` : (x.text || '');
+            }).filter(Boolean).join('\n');
+        }
 
         // GitHub API Helpers
         async function githubApi(path, method = 'GET', body = null) {
@@ -708,9 +753,11 @@
                         document.getElementById('art-content').value = contentJson.body.join('\n');
                     }
                     document.getElementById('art-author').value = (contentJson && contentJson.author) || '';
+                    document.getElementById('art-sources').value = sourcesToText(contentJson && contentJson.sources);
                 } else {
                     document.getElementById('art-content').value = '';
                     document.getElementById('art-author').value = '';
+                    document.getElementById('art-sources').value = '';
                 }
                 log(`Articolo "${art.id}" pronto per la modifica.`, "success");
             } catch (err) {
@@ -730,6 +777,7 @@
             const coverLinesText = document.getElementById('art-cover-lines').value.trim();
             const rawContent = document.getElementById('art-content').value;
             const author = document.getElementById('art-author').value.trim();
+            const sources = parseSources(document.getElementById('art-sources').value);
 
             if (!id || !title) {
                 log("ERRORE: Compila almeno i campi ID e Titolo!", "error");
@@ -757,7 +805,7 @@
                 }
 
                 // 2. Creazione e Upload del JSON dell'articolo in content/{id}.json
-                if (rawContent || author) {
+                if (rawContent || author || sources.length) {
                     log("Formattazione paragrafi...", "info");
                     
                     let paragraphs = rawContent.split(/\r?\n/).map(p => p.trim());
@@ -771,6 +819,10 @@
                     };
                     if (author) {
                         articleJsonObj.author = author;
+                    }
+                    if (sources.length) {
+                        articleJsonObj.sources = sources;
+                        log(`Fonti incluse: ${sources.filter(x => !x.heading).length}.`, "info");
                     }
 
                     const contentPath = `content/${id}.json`;

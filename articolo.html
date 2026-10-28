@@ -25,6 +25,12 @@
 .articolo-firma{margin:56px 0 0;padding-top:20px;border-top:1px solid currentColor;border-top-color:rgba(0,0,0,.18);font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:18px;}
 .articolo-firma[hidden]{display:none;}
 .articolo-wide{padding-bottom:96px;}
+.articolo-fonti{margin-top:72px;text-align:center;}
+.articolo-fonti[hidden]{display:none;}
+.articolo-fonti .rule-double{margin-bottom:28px;}
+.articolo-fonti p{max-width:560px;margin:14px auto 22px;font-size:16px;line-height:1.6;}
+.articolo-fonti-link{display:inline-block;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:19px;color:inherit;text-decoration:none;padding-bottom:3px;border-bottom:1px solid currentColor;transition:opacity .2s;}
+.articolo-fonti-link:hover{opacity:.6;}
 #articolo-autore{display:none!important;}
 </style>
 <noscript><style>.reveal{opacity:1!important; transform:none!important;}</style></noscript>
@@ -85,6 +91,13 @@
   <section id="articolo-correlati" style="display:none;">
     <div class="correlati-title">— Continua a leggere</div>
     <div class="correlati-grid" id="articolo-correlati-grid"></div>
+  </section>
+
+  <section id="articolo-fonti" class="subpage-wrap articolo-fonti" hidden>
+    <div class="rule-double"></div>
+    <span class="kicker">— Fonti</span>
+    <p>Capire richiede di poter verificare. Qui trovi le fonti e i riferimenti su cui si basa questo articolo.</p>
+    <a class="articolo-fonti-link" id="articolo-fonti-link" href="fonti.html">Consulta le fonti →</a>
   </section>
 
 </div>
@@ -149,6 +162,31 @@
     .then(function(r){ if(!r.ok) throw 0; return r.json(); })
     .then(function(j){ if(!show(j&&j.author)) fallback(); })
     .catch(function(){ window.addEventListener('load',function(){ setTimeout(fallback,1200); }); });
+})();
+</script>
+<script>
+(function(){
+  var box=document.getElementById('articolo-fonti'), link=document.getElementById('articolo-fonti-link');
+  if(!box||!link) return;
+  function getId(){
+    var q=new URLSearchParams(location.search), keys=['id','slug','articolo','a','art','n'], i, v;
+    for(i=0;i<keys.length;i++){ v=q.get(keys[i]); if(v) return v; }
+    var first=Array.from(q.values())[0]; if(first) return first;
+    if(location.hash.length>1) return location.hash.slice(1);
+    return '';
+  }
+  var id=getId(); if(!id) return;
+  fetch('content/'+encodeURIComponent(id)+'.json',{cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(j){
+      var s=j&&j.sources; if(!Array.isArray(s)) return;
+      var n=s.filter(function(x){ return x&&!x.heading&&x.text; }).length;
+      if(!n) return;
+      link.href='fonti.html?id='+encodeURIComponent(id);
+      link.textContent='Consulta le fonti ('+n+') \u2192';
+      box.hidden=false;
+    })
+    .catch(function(){});
 })();
 </script>
 <script src="app.js" defer></script>
