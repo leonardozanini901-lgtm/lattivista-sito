@@ -784,7 +784,7 @@
                 return;
             }
 
-            const coverLines = coverLinesText ? coverLinesText.split('\n').map(l => l.trim()).filter(Boolean) : [title];
+            const coverLines = coverLinesText ? coverLinesText.split('\n').map(l => l.trim()).filter(Boolean) : [];
 
             try {
                 log("--> Inizio processo di pubblicazione per: " + id, "info");
